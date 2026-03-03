@@ -87,6 +87,11 @@ def cookies_policy():
     return render_template("legals/cookies_policy.html")
 
 
+@main_bp.route("/500")
+def error_500_preview():
+    return render_template("500.html"), 500
+
+
 @main_bp.route("/robots.txt")
 def robots_txt():
     lines = [

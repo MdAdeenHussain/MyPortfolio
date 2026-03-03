@@ -14,7 +14,7 @@
         <input type="text" name="q" value="{{ q }}" placeholder="Search by name/email/company/plan" class="input-field">
         <select name="status" class="input-field">
             <option value="">All Status</option>
-            {% for s in ['new', 'contacted', 'qualified', 'closed'] %}
+            {% for s in ['new', 'contacted', 'qualified', 'accepted', 'rejected', 'done', 'closed'] %}
             <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s|title }}</option>
             {% endfor %}
         </select>
@@ -30,8 +30,10 @@
                     <th>Plan</th>
                     <th>Budget</th>
                     <th>Status</th>
+                    <th>Maintenance</th>
+                    <th>Until</th>
                     <th>Date</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,17 +43,37 @@
                     <td>{{ lead.email }}</td>
                     <td>{{ lead.selected_plan or '-' }}</td>
                     <td>{{ lead.budget or '-' }}</td>
-                    <td>{{ lead.status }}</td>
+                    <td>{{ (lead.status or 'new')|title }}</td>
+                    <td>{{ 'Subscribed' if lead.maintenance_subscribed else 'Not Subscribed' }}</td>
+                    <td>{{ lead.maintenance_until.strftime('%Y-%m-%d') if lead.maintenance_until else '-' }}</td>
                     <td>{{ lead.created_at.strftime('%d %b %Y') }}</td>
                     <td>
-                        <form method="post" action="{{ url_for('admin.delete_lead', lead_id=lead.id) }}" onsubmit="return confirm('Delete this lead?')">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button class="text-red-300 hover:text-red-200" type="submit">Delete</button>
-                        </form>
+                        <div class="flex flex-col gap-2 min-w-[220px]">
+                            <form method="post" action="{{ url_for('admin.update_lead', lead_id=lead.id) }}" class="space-y-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <select name="status" class="input-field py-2 text-sm">
+                                    {% for s in ['new', 'contacted', 'qualified', 'accepted', 'rejected', 'done', 'closed'] %}
+                                    <option value="{{ s }}" {% if (lead.status or 'new') == s %}selected{% endif %}>{{ s|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="inline-flex items-center gap-2 text-xs text-muted">
+                                    <input type="checkbox" name="maintenance_subscribed" {% if lead.maintenance_subscribed %}checked{% endif %}>
+                                    <span>Subscribed to monthly maintenance</span>
+                                </label>
+                                <input type="date" name="maintenance_until" class="input-field py-2 text-sm"
+                                    value="{{ lead.maintenance_until.strftime('%Y-%m-%d') if lead.maintenance_until else '' }}">
+                                <button class="capsule-btn capsule-secondary text-xs px-3 py-2" type="submit">Update</button>
+                            </form>
+
+                            <form method="post" action="{{ url_for('admin.delete_lead', lead_id=lead.id) }}" onsubmit="return confirm('Delete this lead?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="text-red-300 hover:text-red-200 text-left" type="submit">Delete</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="7">No leads found.</td></tr>
+                <tr><td colspan="10">No leads found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -1,0 +1,56 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Past Clients{% endblock %}
+{% block content %}
+<section class="pt-4 space-y-4">
+    <div class="flex flex-wrap gap-3 items-end justify-between">
+        <div>
+            <h1 class="section-title">Past Clients</h1>
+            <p class="text-muted">All completed clients from Contact Leads and Inquiries.</p>
+        </div>
+        <a href="{{ url_for('admin.export_past_clients_csv', q=q, source=source) }}" class="capsule-btn capsule-secondary">Download CSV</a>
+    </div>
+
+    <form method="get" class="glass-card p-4 grid md:grid-cols-3 gap-3">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name/email/service" class="input-field">
+        <select name="source" class="input-field">
+            <option value="" {% if not source %}selected{% endif %}>All Sources</option>
+            <option value="contacted" {% if source == 'contacted' %}selected{% endif %}>Contacted</option>
+            <option value="inquired" {% if source == 'inquired' %}selected{% endif %}>Inquired</option>
+        </select>
+        <button class="capsule-btn capsule-primary" type="submit">Apply Filter</button>
+    </form>
+
+    <div class="glass-card p-4 overflow-x-auto">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Source</th>
+                    <th>Service/Plan</th>
+                    <th>Status</th>
+                    <th>Maintenance</th>
+                    <th>Until</th>
+                    <th>Completed At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in clients %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.email }}</td>
+                    <td>{{ row.source|title }}</td>
+                    <td>{{ row.service }}</td>
+                    <td>{{ row.status|title }}</td>
+                    <td>{{ 'Subscribed' if row.maintenance_subscribed else 'Not Subscribed' }}</td>
+                    <td>{{ row.maintenance_until.strftime('%Y-%m-%d') if row.maintenance_until else '-' }}</td>
+                    <td>{{ row.completed_at.strftime('%Y-%m-%d %H:%M') if row.completed_at else '-' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8">No past clients found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

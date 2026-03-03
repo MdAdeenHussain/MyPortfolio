@@ -1,13 +1,14 @@
 {% extends 'admin/base_admin.html' %}
 {% block title %}Site Settings{% endblock %}
 {% block content %}
-<section class="pt-4 max-w-3xl">
+<section class="pt-4 grid xl:grid-cols-2 gap-6">
     <div class="glass-card p-6">
         <h1 class="section-title text-2xl">Footer and Social Settings</h1>
         <p class="text-muted mt-2">Update policy footer links and social profile redirects from one place.</p>
 
         <form method="post" class="mt-6 space-y-4">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="form_action" value="social">
 
             <input name="instagram_url" type="text" class="input-field" placeholder="Instagram URL"
                 value="{{ settings_row.instagram_url or '' }}">
@@ -23,5 +24,54 @@
             <button type="submit" class="capsule-btn capsule-primary">Save Settings</button>
         </form>
     </div>
+
+    <div class="glass-card p-6">
+        <h2 class="section-title text-2xl">Change Credentials</h2>
+        <p class="text-muted mt-2">Name, email, phone, and password can be updated here. Current password verification is required.</p>
+
+        <form method="post" class="mt-6 space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="form_action" value="credentials">
+
+            <input name="full_name" type="text" class="input-field" placeholder="Full Name"
+                value="{{ current_user.full_name or '' }}" required>
+            <input name="email" type="email" class="input-field" placeholder="Email"
+                value="{{ current_user.email or '' }}" required>
+            <input name="phone_number" type="text" class="input-field" placeholder="Phone Number"
+                value="{{ current_user.phone_number or '' }}">
+
+            <div class="grid md:grid-cols-[1fr_auto] gap-2 items-center">
+                <input id="newPasswordInput" name="new_password" type="password" class="input-field" placeholder="•••••••• (leave blank to keep current)">
+                <button type="button" class="capsule-btn capsule-secondary" data-toggle-password="#newPasswordInput">Show</button>
+            </div>
+
+            <div class="grid md:grid-cols-[1fr_auto] gap-2 items-center">
+                <input id="confirmPasswordInput" name="confirm_password" type="password" class="input-field" placeholder="•••••••• (confirm new password)">
+                <button type="button" class="capsule-btn capsule-secondary" data-toggle-password="#confirmPasswordInput">Show</button>
+            </div>
+
+            <div class="grid md:grid-cols-[1fr_auto] gap-2 items-center">
+                <input id="currentPasswordInput" name="current_password" type="password" class="input-field" placeholder="•••••••• (current password required)" required>
+                <button type="button" class="capsule-btn capsule-secondary" data-toggle-password="#currentPasswordInput">Show</button>
+            </div>
+
+            <button type="submit" class="capsule-btn capsule-primary">Update Credentials</button>
+        </form>
+    </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll("[data-toggle-password]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const selector = button.getAttribute("data-toggle-password");
+            const input = document.querySelector(selector);
+            if (!input) return;
+            const nextType = input.type === "password" ? "text" : "password";
+            input.type = nextType;
+            button.textContent = nextType === "password" ? "Show" : "Hide";
+        });
+    });
+</script>
 {% endblock %}

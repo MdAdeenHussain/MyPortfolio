@@ -4,7 +4,7 @@ from datetime import datetime
 from urllib.parse import quote
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Flask, render_template, url_for
 
@@ -94,6 +94,45 @@ def maybe_fallback_to_sqlite(app, env_name):
             app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///portfolio.db"
 
 
+def ensure_runtime_schema_compatibility(app):
+    """Best-effort guard for missing columns when code is newer than DB migrations."""
+    try:
+        inspector = inspect(db.engine)
+        pending_statements = []
+
+        if inspector.has_table("admin_users"):
+            admin_columns = {col["name"] for col in inspector.get_columns("admin_users")}
+            if "phone_number" not in admin_columns:
+                pending_statements.append("ALTER TABLE admin_users ADD COLUMN phone_number VARCHAR(30)")
+
+        if inspector.has_table("plan_inquiries"):
+            inquiry_columns = {col["name"] for col in inspector.get_columns("plan_inquiries")}
+            if "maintenance_subscribed" not in inquiry_columns:
+                pending_statements.append("ALTER TABLE plan_inquiries ADD COLUMN maintenance_subscribed BOOLEAN")
+            if "maintenance_until" not in inquiry_columns:
+                pending_statements.append("ALTER TABLE plan_inquiries ADD COLUMN maintenance_until DATE")
+            if "completed_at" not in inquiry_columns:
+                pending_statements.append("ALTER TABLE plan_inquiries ADD COLUMN completed_at TIMESTAMP")
+
+        if inspector.has_table("contact_leads"):
+            lead_columns = {col["name"] for col in inspector.get_columns("contact_leads")}
+            if "maintenance_subscribed" not in lead_columns:
+                pending_statements.append("ALTER TABLE contact_leads ADD COLUMN maintenance_subscribed BOOLEAN")
+            if "maintenance_until" not in lead_columns:
+                pending_statements.append("ALTER TABLE contact_leads ADD COLUMN maintenance_until DATE")
+            if "completed_at" not in lead_columns:
+                pending_statements.append("ALTER TABLE contact_leads ADD COLUMN completed_at TIMESTAMP")
+
+        if pending_statements:
+            for statement in pending_statements:
+                db.session.execute(text(statement))
+            db.session.commit()
+            app.logger.info("Applied runtime schema compatibility updates.")
+    except Exception as exc:
+        db.session.rollback()
+        app.logger.warning("Skipped runtime schema compatibility updates: %s", exc)
+
+
 def create_app(config_name=None):
     app = Flask(__name__)
 
@@ -123,6 +162,9 @@ def create_app(config_name=None):
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(admin_bp)
+
+    with app.app_context():
+        ensure_runtime_schema_compatibility(app)
 
     @app.context_processor
     def inject_globals():
@@ -164,6 +206,11 @@ def create_app(config_name=None):
     @app.errorhandler(404)
     def not_found(_):
         return render_template("404.html"), 404
+
+    @app.errorhandler(500)
+    def server_error(_):
+        db.session.rollback()
+        return render_template("500.html"), 500
 
     @app.cli.command("seed-demo")
     def seed_demo():

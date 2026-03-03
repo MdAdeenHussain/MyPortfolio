@@ -2,8 +2,24 @@
 {% block title %}Plan Inquiries{% endblock %}
 {% block content %}
 <section class="pt-4">
-    <h1 class="section-title">Plan Inquiries</h1>
-    <p class="text-muted">High-intent inquiry submissions from the pricing funnel.</p>
+    <div class="flex flex-wrap gap-3 items-end justify-between">
+        <div>
+            <h1 class="section-title">Plan Inquiries</h1>
+            <p class="text-muted">High-intent inquiry submissions from the pricing funnel. Manage workflow and completion status.</p>
+        </div>
+        <a href="{{ url_for('admin.export_inquiries_csv') }}" class="capsule-btn capsule-secondary">Download CSV</a>
+    </div>
+
+    <form method="get" class="glass-card p-4 grid md:grid-cols-3 gap-3 mt-4">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name/email/service/plan" class="input-field">
+        <select name="status" class="input-field">
+            <option value="">All Status</option>
+            {% for s in ['pending', 'accepted', 'rejected', 'done'] %}
+            <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+        <button class="capsule-btn capsule-primary" type="submit">Apply Filter</button>
+    </form>
 
     <div class="glass-card p-4 overflow-x-auto mt-4">
         <table class="admin-table">
@@ -15,7 +31,10 @@
                     <th>Plan</th>
                     <th>Timeline</th>
                     <th>Budget</th>
-                    <th>Action</th>
+                    <th>Status</th>
+                    <th>Maintenance</th>
+                    <th>Until</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,15 +46,37 @@
                     <td>{{ row.plan_name }}</td>
                     <td>{{ row.timeline or '-' }}</td>
                     <td>{{ row.budget or '-' }}</td>
+                    <td>{{ (row.status or 'pending')|title }}</td>
+                    <td>{{ 'Subscribed' if row.maintenance_subscribed else 'Not Subscribed' }}</td>
+                    <td>{{ row.maintenance_until.strftime('%Y-%m-%d') if row.maintenance_until else '-' }}</td>
                     <td>
-                        <form method="post" action="{{ url_for('admin.delete_inquiry', inquiry_id=row.id) }}" onsubmit="return confirm('Delete this inquiry?')">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button class="text-red-300 hover:text-red-200" type="submit">Delete</button>
-                        </form>
+                        <div class="flex flex-col gap-2 min-w-[220px]">
+                            <form method="post" action="{{ url_for('admin.update_inquiry', inquiry_id=row.id) }}" class="space-y-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <select name="status" class="input-field py-2 text-sm">
+                                    <option value="pending" {% if row.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="accepted" {% if row.status == 'accepted' %}selected{% endif %}>Accepted</option>
+                                    <option value="rejected" {% if row.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                    <option value="done" {% if row.status == 'done' %}selected{% endif %}>Done</option>
+                                </select>
+                                <label class="inline-flex items-center gap-2 text-xs text-muted">
+                                    <input type="checkbox" name="maintenance_subscribed" {% if row.maintenance_subscribed %}checked{% endif %}>
+                                    <span>Subscribed to monthly maintenance</span>
+                                </label>
+                                <input type="date" name="maintenance_until" class="input-field py-2 text-sm"
+                                    value="{{ row.maintenance_until.strftime('%Y-%m-%d') if row.maintenance_until else '' }}">
+                                <button class="capsule-btn capsule-secondary text-xs px-3 py-2" type="submit">Update</button>
+                            </form>
+
+                            <form method="post" action="{{ url_for('admin.delete_inquiry', inquiry_id=row.id) }}" onsubmit="return confirm('Delete this inquiry?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="text-red-300 hover:text-red-200 text-left" type="submit">Delete</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="7">No inquiries found.</td></tr>
+                <tr><td colspan="10">No inquiries found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

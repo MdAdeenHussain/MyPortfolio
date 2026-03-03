@@ -86,6 +86,77 @@ def admin_only_required():
     return None
 
 
+def parse_iso_date(raw_value):
+    value = (raw_value or "").strip()
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def build_past_clients_rows(search_query="", source_filter=""):
+    q = (search_query or "").strip().lower()
+    source_filter = (source_filter or "").strip().lower()
+
+    lead_query = ContactLeads.query.filter(ContactLeads.status.in_(["done", "closed"]))
+    inquiry_query = PlanInquiries.query.filter(PlanInquiries.status == "done")
+
+    if q:
+        like_pattern = f"%{q}%"
+        lead_query = lead_query.filter(
+            or_(
+                ContactLeads.full_name.ilike(like_pattern),
+                ContactLeads.email.ilike(like_pattern),
+                ContactLeads.company.ilike(like_pattern),
+                ContactLeads.selected_plan.ilike(like_pattern),
+            )
+        )
+        inquiry_query = inquiry_query.filter(
+            or_(
+                PlanInquiries.full_name.ilike(like_pattern),
+                PlanInquiries.email.ilike(like_pattern),
+                PlanInquiries.plan_name.ilike(like_pattern),
+                PlanInquiries.service_type.ilike(like_pattern),
+            )
+        )
+
+    rows = []
+    if source_filter in {"", "contacted"}:
+        for lead in lead_query.all():
+            rows.append(
+                {
+                    "name": lead.full_name,
+                    "email": lead.email,
+                    "source": "contacted",
+                    "service": lead.selected_plan or "-",
+                    "status": lead.status or "done",
+                    "maintenance_subscribed": bool(lead.maintenance_subscribed),
+                    "maintenance_until": lead.maintenance_until,
+                    "completed_at": lead.completed_at or lead.updated_at or lead.created_at,
+                }
+            )
+
+    if source_filter in {"", "inquired"}:
+        for inquiry in inquiry_query.all():
+            rows.append(
+                {
+                    "name": inquiry.full_name,
+                    "email": inquiry.email,
+                    "source": "inquired",
+                    "service": f"{inquiry.service_type} - {inquiry.plan_name}",
+                    "status": inquiry.status or "done",
+                    "maintenance_subscribed": bool(inquiry.maintenance_subscribed),
+                    "maintenance_until": inquiry.maintenance_until,
+                    "completed_at": inquiry.completed_at or inquiry.updated_at or inquiry.created_at,
+                }
+            )
+
+    rows.sort(key=lambda row: row["completed_at"] or datetime.min, reverse=True)
+    return rows
+
+
 @admin_bp.route("/login", methods=["GET", "POST"])
 @limiter.limit("10/minute")
 def login():
@@ -228,6 +299,48 @@ def leads():
     return render_template("admin/leads.html", leads=rows, q=q, status=status)
 
 
+@admin_bp.route("/leads/<int:lead_id>/update", methods=["POST"])
+@login_required
+def update_lead(lead_id):
+    gate = admin_only_required()
+    if gate:
+        return gate
+
+    row = ContactLeads.query.get_or_404(lead_id)
+    next_status = request.form.get("status", "").strip().lower()
+    allowed_status = {"new", "contacted", "qualified", "accepted", "rejected", "done", "closed"}
+    if next_status not in allowed_status:
+        flash("Invalid lead status.", "danger")
+        return redirect(url_for("admin.leads"))
+
+    maintenance_subscribed = request.form.get("maintenance_subscribed") == "on"
+    maintenance_until = parse_iso_date(request.form.get("maintenance_until", ""))
+    maintenance_until_raw = request.form.get("maintenance_until", "").strip()
+    if maintenance_until_raw and not maintenance_until:
+        flash("Invalid maintenance end date.", "danger")
+        return redirect(url_for("admin.leads"))
+
+    if next_status not in {"done", "closed"}:
+        maintenance_subscribed = False
+        maintenance_until = None
+        row.completed_at = None
+    else:
+        row.completed_at = datetime.utcnow()
+        if maintenance_subscribed and not maintenance_until:
+            flash("Please add maintenance end date when subscription is active.", "danger")
+            return redirect(url_for("admin.leads"))
+        if not maintenance_subscribed:
+            maintenance_until = None
+
+    row.status = next_status
+    row.maintenance_subscribed = maintenance_subscribed
+    row.maintenance_until = maintenance_until
+    log_action("Updated lead workflow", "ContactLeads", row.id)
+    db.session.commit()
+    flash("Lead updated.", "success")
+    return redirect(url_for("admin.leads"))
+
+
 @admin_bp.route("/leads/export")
 @login_required
 def export_leads_csv():
@@ -237,7 +350,21 @@ def export_leads_csv():
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["ID", "Name", "Email", "Company", "Plan", "Budget", "Status", "Created At"])
+    writer.writerow(
+        [
+            "ID",
+            "Name",
+            "Email",
+            "Company",
+            "Plan",
+            "Budget",
+            "Status",
+            "Maintenance Subscribed",
+            "Maintenance Until",
+            "Completed At",
+            "Created At",
+        ]
+    )
 
     for lead in ContactLeads.query.order_by(ContactLeads.created_at.desc()).all():
         writer.writerow(
@@ -249,6 +376,9 @@ def export_leads_csv():
                 lead.selected_plan,
                 lead.budget,
                 lead.status,
+                "Yes" if lead.maintenance_subscribed else "No",
+                lead.maintenance_until.strftime("%Y-%m-%d") if lead.maintenance_until else "",
+                lead.completed_at.strftime("%Y-%m-%d %H:%M") if lead.completed_at else "",
                 lead.created_at.strftime("%Y-%m-%d %H:%M"),
             ]
         )
@@ -280,8 +410,173 @@ def inquiries():
     if gate:
         return gate
 
-    rows = PlanInquiries.query.order_by(PlanInquiries.created_at.desc()).all()
-    return render_template("admin/inquiries.html", inquiries=rows)
+    q = request.args.get("q", "").strip()
+    status = request.args.get("status", "").strip()
+
+    query = PlanInquiries.query
+    if q:
+        like_pattern = f"%{q}%"
+        query = query.filter(
+            or_(
+                PlanInquiries.full_name.ilike(like_pattern),
+                PlanInquiries.email.ilike(like_pattern),
+                PlanInquiries.plan_name.ilike(like_pattern),
+                PlanInquiries.service_type.ilike(like_pattern),
+            )
+        )
+    if status:
+        query = query.filter_by(status=status)
+
+    rows = query.order_by(PlanInquiries.created_at.desc()).all()
+    return render_template("admin/inquiries.html", inquiries=rows, q=q, status=status)
+
+
+@admin_bp.route("/inquiries/export")
+@login_required
+def export_inquiries_csv():
+    gate = admin_only_required()
+    if gate:
+        return gate
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(
+        [
+            "ID",
+            "Name",
+            "Email",
+            "Service Type",
+            "Plan Name",
+            "Timeline",
+            "Budget",
+            "Status",
+            "Maintenance Subscribed",
+            "Maintenance Until",
+            "Completed At",
+            "Created At",
+        ]
+    )
+
+    for row in PlanInquiries.query.order_by(PlanInquiries.created_at.desc()).all():
+        writer.writerow(
+            [
+                row.id,
+                row.full_name,
+                row.email,
+                row.service_type,
+                row.plan_name,
+                row.timeline or "",
+                row.budget or "",
+                row.status,
+                "Yes" if row.maintenance_subscribed else "No",
+                row.maintenance_until.strftime("%Y-%m-%d") if row.maintenance_until else "",
+                row.completed_at.strftime("%Y-%m-%d %H:%M") if row.completed_at else "",
+                row.created_at.strftime("%Y-%m-%d %H:%M"),
+            ]
+        )
+
+    response = Response(output.getvalue(), mimetype="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=plan_inquiries.csv"
+    return response
+
+
+@admin_bp.route("/inquiries/<int:inquiry_id>/update", methods=["POST"])
+@login_required
+def update_inquiry(inquiry_id):
+    gate = admin_only_required()
+    if gate:
+        return gate
+
+    row = PlanInquiries.query.get_or_404(inquiry_id)
+    next_status = request.form.get("status", "").strip().lower()
+    allowed_status = {"pending", "accepted", "rejected", "done"}
+    if next_status not in allowed_status:
+        flash("Invalid inquiry status.", "danger")
+        return redirect(url_for("admin.inquiries"))
+
+    maintenance_subscribed = request.form.get("maintenance_subscribed") == "on"
+    maintenance_until_raw = request.form.get("maintenance_until", "").strip()
+    maintenance_until = parse_iso_date(maintenance_until_raw)
+    if maintenance_until_raw and not maintenance_until:
+        flash("Invalid maintenance end date.", "danger")
+        return redirect(url_for("admin.inquiries"))
+
+    if next_status != "done":
+        maintenance_subscribed = False
+        maintenance_until = None
+        row.completed_at = None
+    else:
+        row.completed_at = datetime.utcnow()
+        if maintenance_subscribed and not maintenance_until:
+            flash("Please add maintenance end date when subscription is active.", "danger")
+            return redirect(url_for("admin.inquiries"))
+        if not maintenance_subscribed:
+            maintenance_until = None
+
+    row.status = next_status
+    row.maintenance_subscribed = maintenance_subscribed
+    row.maintenance_until = maintenance_until
+    log_action("Updated inquiry workflow", "PlanInquiries", row.id)
+    db.session.commit()
+    flash("Inquiry updated.", "success")
+    return redirect(url_for("admin.inquiries"))
+
+
+@admin_bp.route("/past-clients")
+@login_required
+def past_clients():
+    gate = admin_only_required()
+    if gate:
+        return gate
+
+    q = request.args.get("q", "").strip()
+    source = request.args.get("source", "").strip().lower()
+    rows = build_past_clients_rows(q, source)
+    return render_template("admin/past_clients.html", clients=rows, q=q, source=source)
+
+
+@admin_bp.route("/past-clients/export")
+@login_required
+def export_past_clients_csv():
+    gate = admin_only_required()
+    if gate:
+        return gate
+
+    q = request.args.get("q", "").strip()
+    source = request.args.get("source", "").strip().lower()
+    rows = build_past_clients_rows(q, source)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(
+        [
+            "Name",
+            "Email",
+            "Source",
+            "Service/Plan",
+            "Status",
+            "Maintenance Subscribed",
+            "Maintenance Until",
+            "Completed At",
+        ]
+    )
+    for row in rows:
+        writer.writerow(
+            [
+                row["name"],
+                row["email"],
+                row["source"],
+                row["service"],
+                row["status"],
+                "Yes" if row["maintenance_subscribed"] else "No",
+                row["maintenance_until"].strftime("%Y-%m-%d") if row["maintenance_until"] else "",
+                row["completed_at"].strftime("%Y-%m-%d %H:%M") if row["completed_at"] else "",
+            ]
+        )
+
+    response = Response(output.getvalue(), mimetype="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=past_clients.csv"
+    return response
 
 
 @admin_bp.route("/inquiries/<int:inquiry_id>/delete", methods=["POST"])
@@ -595,15 +890,58 @@ def settings():
     settings_row = get_or_create_site_settings()
 
     if request.method == "POST":
-        settings_row.instagram_url = normalize_url(request.form.get("instagram_url", ""))
-        settings_row.x_url = normalize_url(request.form.get("x_url", ""))
-        settings_row.linkedin_url = normalize_url(request.form.get("linkedin_url", ""))
-        settings_row.facebook_url = normalize_url(request.form.get("facebook_url", ""))
-        settings_row.whatsapp_number = request.form.get("whatsapp_number", "").strip() or "+91 9674667587"
+        form_action = request.form.get("form_action", "social")
+        if form_action == "social":
+            settings_row.instagram_url = normalize_url(request.form.get("instagram_url", ""))
+            settings_row.x_url = normalize_url(request.form.get("x_url", ""))
+            settings_row.linkedin_url = normalize_url(request.form.get("linkedin_url", ""))
+            settings_row.facebook_url = normalize_url(request.form.get("facebook_url", ""))
+            settings_row.whatsapp_number = request.form.get("whatsapp_number", "").strip() or "+91 9674667587"
 
-        log_action("Updated site settings", "SiteSettings", settings_row.id)
-        db.session.commit()
-        flash("Footer links and WhatsApp settings updated.", "success")
+            log_action("Updated site settings", "SiteSettings", settings_row.id)
+            db.session.commit()
+            flash("Footer links and WhatsApp settings updated.", "success")
+            return redirect(url_for("admin.settings"))
+
+        if form_action == "credentials":
+            current_password = request.form.get("current_password", "")
+            if not current_password or not current_user.check_password(current_password):
+                flash("Current password verification failed.", "danger")
+                return redirect(url_for("admin.settings"))
+
+            full_name = request.form.get("full_name", "").strip()
+            email = request.form.get("email", "").strip().lower()
+            phone_number = request.form.get("phone_number", "").strip()
+            new_password = request.form.get("new_password", "")
+            confirm_password = request.form.get("confirm_password", "")
+
+            if not full_name or not email:
+                flash("Name and email are required.", "danger")
+                return redirect(url_for("admin.settings"))
+
+            existing_admin = AdminUser.query.filter(AdminUser.email == email, AdminUser.id != current_user.id).first()
+            if existing_admin:
+                flash("Email already in use by another admin.", "danger")
+                return redirect(url_for("admin.settings"))
+
+            if new_password:
+                if len(new_password) < 8:
+                    flash("New password must be at least 8 characters.", "danger")
+                    return redirect(url_for("admin.settings"))
+                if new_password != confirm_password:
+                    flash("New password and confirm password do not match.", "danger")
+                    return redirect(url_for("admin.settings"))
+                current_user.set_password(new_password)
+
+            current_user.full_name = full_name
+            current_user.email = email
+            current_user.phone_number = phone_number
+            log_action("Updated admin credentials", "AdminUser", current_user.id)
+            db.session.commit()
+            flash("Credentials updated successfully.", "success")
+            return redirect(url_for("admin.settings"))
+
+        flash("Invalid settings action.", "danger")
         return redirect(url_for("admin.settings"))
 
     return render_template("admin/settings.html", settings_row=settings_row)

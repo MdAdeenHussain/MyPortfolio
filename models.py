@@ -33,6 +33,9 @@ class ContactLeads(db.Model, TimestampMixin):
     attachment_path = db.Column(db.String(255))
     source = db.Column(db.String(120), default="portfolio-contact")
     status = db.Column(db.String(50), default="new", index=True)
+    maintenance_subscribed = db.Column(db.Boolean, default=False)
+    maintenance_until = db.Column(db.Date)
+    completed_at = db.Column(db.DateTime)
 
 
 class PlanInquiries(db.Model, TimestampMixin):
@@ -47,6 +50,9 @@ class PlanInquiries(db.Model, TimestampMixin):
     timeline = db.Column(db.String(80))
     budget = db.Column(db.String(50))
     status = db.Column(db.String(50), default="pending", index=True)
+    maintenance_subscribed = db.Column(db.Boolean, default=False)
+    maintenance_until = db.Column(db.Date)
+    completed_at = db.Column(db.DateTime)
 
 
 class BlogPosts(db.Model, TimestampMixin):
@@ -69,6 +75,7 @@ class AdminUser(UserMixin, db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(180), unique=True, nullable=False, index=True)
+    phone_number = db.Column(db.String(30), default="")
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default="admin")
     is_active_admin = db.Column(db.Boolean, default=True)

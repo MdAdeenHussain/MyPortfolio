@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}500 | Server Error{% endblock %}
+{% block content %}
+<section class="section-gap pt-24">
+    <style>
+        .glitch-force-500::before,
+        .glitch-force-500::after {
+            content: "500" !important;
+        }
+    </style>
+    <div class="container mx-auto px-4 text-center max-w-3xl">
+        <p class="glitch glitch-force-500" data-text="500">500</p>
+        <h1 class="section-title mt-4">System overload. We are stabilizing the stack.</h1>
+        <p class="text-muted mt-4">Something broke on our side. Redirecting to home in a few seconds.</p>
+        <a href="{{ url_for('main.home') }}" class="capsule-btn capsule-primary mt-8">Go Home</a>
+    </div>
+</section>
+<script>
+setTimeout(() => {
+    window.location.href = "{{ url_for('main.home') }}";
+}, 8000);
+</script>
+{% endblock %}
