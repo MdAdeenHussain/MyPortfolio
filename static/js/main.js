@@ -31,6 +31,20 @@
         toggleScrollTopVisibility();
     }
 
+    const heroSequenceItems = document.querySelectorAll("#home .hero-seq-item");
+    if (heroSequenceItems.length > 0) {
+        heroSequenceItems.forEach((item) => {
+            const step = Number(item.dataset.heroStep || 0);
+            item.style.setProperty("--hero-step", String(step));
+        });
+
+        window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => {
+                document.body.classList.add("hero-seq-ready");
+            });
+        });
+    }
+
     const menuToggles = document.querySelectorAll("[data-menu-target]");
     menuToggles.forEach((toggle) => {
         const menuId = toggle.dataset.menuTarget;
@@ -106,52 +120,195 @@
         revealItems.forEach((item) => observer.observe(item));
     }
 
-    const heroCharacterStage = document.getElementById("heroCharacterStage");
-    const heroCursorOrb = document.getElementById("heroCursorOrb");
-    if (heroCharacterStage) {
+    const aboutSequenceItems = document.querySelectorAll("#about .about-seq-item");
+    if (aboutSequenceItems.length > 0) {
+        const aboutSection = document.getElementById("about");
+        const aboutParagraphItems = Array.from(document.querySelectorAll("#about .about-para-item"));
+        const aboutListItems = Array.from(document.querySelectorAll("#about .about-list-item"));
         const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-        const setCharacterVector = (mx, my) => {
-            heroCharacterStage.style.setProperty("--mx", mx.toFixed(3));
-            heroCharacterStage.style.setProperty("--my", my.toFixed(3));
-        };
-
-        const updateFromPointer = (clientX, clientY) => {
-            const rect = heroCharacterStage.getBoundingClientRect();
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-            const nx = clamp((x / rect.width) * 2 - 1, -1, 1);
-            const ny = clamp((y / rect.height) * 2 - 1, -1, 1);
-            setCharacterVector(nx, ny);
-
-            if (heroCursorOrb) {
-                heroCursorOrb.style.left = `${x}px`;
-                heroCursorOrb.style.top = `${y}px`;
-                heroCursorOrb.style.opacity = "1";
-            }
-        };
-
-        const resetCharacter = () => {
-            setCharacterVector(0, 0);
-            if (heroCursorOrb) {
-                heroCursorOrb.style.opacity = "0";
-            }
-        };
-
-        heroCharacterStage.addEventListener("mousemove", (event) => {
-            updateFromPointer(event.clientX, event.clientY);
-        });
-
-        heroCharacterStage.addEventListener("touchmove", (event) => {
-            const touch = event.touches && event.touches[0];
-            if (!touch) {
+        const applySequentialVisibility = (items, localProgress) => {
+            const count = items.length;
+            if (!count) {
                 return;
             }
-            updateFromPointer(touch.clientX, touch.clientY);
+            items.forEach((item, index) => {
+                const threshold = (index + 1) / (count + 1);
+                item.classList.toggle("is-visible", localProgress >= threshold);
+            });
+        };
+
+        const updateAboutSequence = () => {
+            if (!aboutSection) {
+                return;
+            }
+
+            const rect = aboutSection.getBoundingClientRect();
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+
+            const start = viewportHeight * 0.9;
+            const end = -rect.height * 0.2;
+            const totalDistance = Math.max(1, start - end);
+            const progress = clamp((start - rect.top) / totalDistance, 0, 1);
+
+            // Delay paragraph reveal until About section is almost visible.
+            const paragraphProgress = clamp((progress - 0.22) / 0.46, 0, 1);
+            // Keep list behavior close to current flow after paragraph reveal starts.
+            const listProgress = clamp((progress - 0.36) / 0.56, 0, 1);
+
+            applySequentialVisibility(aboutParagraphItems, paragraphProgress);
+            applySequentialVisibility(aboutListItems, listProgress);
+        };
+
+        window.addEventListener("scroll", updateAboutSequence, { passive: true });
+        window.addEventListener("resize", updateAboutSequence);
+        updateAboutSequence();
+    }
+
+    const scrollSeqGroups = document.querySelectorAll("[data-scroll-seq]");
+    if (scrollSeqGroups.length > 0) {
+        const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+        let rafId = 0;
+
+        const updateScrollSequenceGroups = () => {
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+
+            scrollSeqGroups.forEach((group) => {
+                const items = Array.from(group.querySelectorAll(".scroll-seq-item"));
+                if (!items.length) {
+                    return;
+                }
+
+                const rect = group.getBoundingClientRect();
+                const start = viewportHeight * 0.9;
+                const end = -Math.max(rect.height * 0.18, viewportHeight * 0.12);
+                const totalDistance = Math.max(1, start - end);
+                const progress = clamp((start - rect.top) / totalDistance, 0, 1);
+                const itemCount = items.length;
+
+                items.forEach((item, index) => {
+                    const threshold = (index + 1) / (itemCount + 1);
+                    item.classList.toggle("is-visible", progress >= threshold);
+                });
+            });
+        };
+
+        const scheduleGroupUpdate = () => {
+            if (rafId) {
+                return;
+            }
+            rafId = window.requestAnimationFrame(() => {
+                rafId = 0;
+                updateScrollSequenceGroups();
+            });
+        };
+
+        window.addEventListener("scroll", scheduleGroupUpdate, { passive: true });
+        window.addEventListener("resize", scheduleGroupUpdate);
+        updateScrollSequenceGroups();
+    }
+
+    const heroImageReveal = document.getElementById("heroImageReveal");
+    const heroRevealLens = document.getElementById("heroRevealLens");
+    if (heroImageReveal) {
+        const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+        let lensSize = 140;
+        let targetX = 0;
+        let targetY = 0;
+        let rafId = 0;
+        let isActive = false;
+
+        const updateLensSize = () => {
+            const rect = heroImageReveal.getBoundingClientRect();
+            lensSize = clamp(Math.round(Math.min(rect.width, rect.height) * 0.28), 104, 190);
+            heroImageReveal.style.setProperty("--lens-size", `${lensSize}px`);
+        };
+
+        const setTarget = (clientX, clientY) => {
+            const rect = heroImageReveal.getBoundingClientRect();
+            targetX = clamp(clientX - rect.left, 0, rect.width);
+            targetY = clamp(clientY - rect.top, 0, rect.height);
+        };
+
+        const renderReveal = () => {
+            if (!isActive) {
+                rafId = 0;
+                return;
+            }
+            heroImageReveal.style.setProperty("--reveal-x", `${targetX}px`);
+            heroImageReveal.style.setProperty("--reveal-y", `${targetY}px`);
+            heroImageReveal.style.setProperty("--reveal-size", `${Math.round(lensSize * 0.5)}px`);
+            rafId = window.requestAnimationFrame(renderReveal);
+        };
+
+        const startRevealLoop = () => {
+            if (rafId) {
+                return;
+            }
+            rafId = window.requestAnimationFrame(renderReveal);
+        };
+
+        const activateReveal = (clientX, clientY) => {
+            setTarget(clientX, clientY);
+            isActive = true;
+            heroImageReveal.classList.add("is-active");
+            if (heroRevealLens) {
+                heroRevealLens.style.opacity = "1";
+            }
+            startRevealLoop();
+        };
+
+        const resetReveal = () => {
+            isActive = false;
+            if (rafId) {
+                window.cancelAnimationFrame(rafId);
+                rafId = 0;
+            }
+            heroImageReveal.style.setProperty("--reveal-size", "0px");
+            heroImageReveal.classList.remove("is-active");
+            if (heroRevealLens) {
+                heroRevealLens.style.opacity = "0";
+            }
+        };
+
+        const centerReveal = () => {
+            const rect = heroImageReveal.getBoundingClientRect();
+            heroImageReveal.style.setProperty("--reveal-x", `${rect.width / 2}px`);
+            heroImageReveal.style.setProperty("--reveal-y", `${rect.height / 2}px`);
+        };
+
+        heroImageReveal.addEventListener("pointerenter", (event) => {
+            activateReveal(event.clientX, event.clientY);
         });
 
-        heroCharacterStage.addEventListener("mouseleave", resetCharacter);
-        heroCharacterStage.addEventListener("touchend", resetCharacter);
-        resetCharacter();
+        heroImageReveal.addEventListener("pointermove", (event) => {
+            if (!isActive) {
+                activateReveal(event.clientX, event.clientY);
+                return;
+            }
+            setTarget(event.clientX, event.clientY);
+        });
+
+        heroImageReveal.addEventListener("pointerdown", (event) => {
+            activateReveal(event.clientX, event.clientY);
+        });
+
+        heroImageReveal.addEventListener("pointerleave", resetReveal);
+        heroImageReveal.addEventListener("pointercancel", resetReveal);
+        heroImageReveal.addEventListener("pointerup", () => {
+            if (window.matchMedia("(hover: none)").matches) {
+                resetReveal();
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            updateLensSize();
+            if (!isActive) {
+                centerReveal();
+            }
+        });
+        updateLensSize();
+        centerReveal();
+        resetReveal();
     }
 
     const counters = document.querySelectorAll("[data-counter]");

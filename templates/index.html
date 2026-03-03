@@ -4,54 +4,46 @@
 <section id="home" class="hero-section pt-12 md:pt-20">
     <div class="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
         <div>
-            <p class="eyebrow mb-5">Building Revenue-Driven Digital Platforms</p>
-            <h1 class="hero-heading reveal">Building Scalable Digital Systems for Modern Businesses</h1>
-            <p class="hero-sub mt-6 reveal">I design and engineer performance-driven websites, automation systems, and AI-powered solutions that help businesses operate smarter, convert better, and scale faster.</p>
-            <div class="mt-8 flex flex-wrap gap-4 reveal">
+            <p class="eyebrow mb-5 hero-seq-item" data-hero-step="1">Building Revenue-Driven Digital Platforms</p>
+            <h1 class="hero-heading hero-seq-item" data-hero-step="2">Building Scalable Digital Systems for Modern Businesses</h1>
+            <p class="hero-sub mt-6 hero-seq-item" data-hero-step="3">I design and engineer performance-driven websites, automation systems, and AI-powered solutions that help businesses operate smarter, convert better, and scale faster.</p>
+            <div class="mt-8 flex flex-wrap gap-4 hero-seq-item" data-hero-step="4">
                 <a href="#plans" class="capsule-btn capsule-primary pulse-glow">Explore Solutions</a>
                 <a href="#contact" class="capsule-btn capsule-secondary">Start a project</a>
             </div>
-            <div class="grid grid-cols-3 gap-4 mt-10 reveal">
-                <div class="stat-card">
+            <div class="grid grid-cols-3 gap-4 mt-10">
+                <div class="stat-card hero-seq-item" data-hero-step="5">
                     <span class="stat-label">Performance-Optimized Builds</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card hero-seq-item" data-hero-step="6">
                     <span class="stat-label">Secure Backend Systems</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card hero-seq-item" data-hero-step="7">
                     <span class="stat-label">Automation-Driven Solutions</span>
                 </div>
             </div>
-            <a href="#about" class="scroll-indicator reveal" aria-label="Scroll to About section">Scroll</a>
+            <a href="#about" class="scroll-indicator hero-seq-item" data-hero-step="8" aria-label="Scroll to About section">Scroll</a>
         </div>
-        <div class="hero-visual reveal">
-            <div class="hero-spline hero-character-stage" id="heroCharacterStage" aria-label="Interactive character animation">
-                <div class="hero-character" id="heroCharacter">
-                    <div class="character-shadow"></div>
-                    <div class="character-seat"></div>
-
-                    <div class="character-laptop">
-                        <span class="laptop-screen"></span>
-                        <span class="laptop-base"></span>
-                    </div>
-
-                    <div class="character-body">
-                        <div class="character-head">
-                            <span class="character-eye eye-left"><span class="character-pupil"></span></span>
-                            <span class="character-eye eye-right"><span class="character-pupil"></span></span>
-                        </div>
-                        <div class="character-torso"></div>
-                        <div class="character-arm arm-left"></div>
-                        <div class="character-arm arm-right"></div>
-                    </div>
-                </div>
-                <span class="cursor-orb" id="heroCursorOrb" aria-hidden="true"></span>
+        <div class="hero-visual hero-seq-item" data-hero-step="2">
+            <div class="hero-spline hero-image-reveal" id="heroImageReveal" aria-label="Interactive hero image reveal">
+                <img
+                    src="{{ url_for('static', filename='img/hero/hero-visible.png') }}"
+                    alt="Developer working on a laptop"
+                    class="hero-image-layer hero-image-base"
+                >
+                <img
+                    src="{{ url_for('static', filename='img/hero/hero-hidden.png') }}"
+                    alt=""
+                    aria-hidden="true"
+                    class="hero-image-layer hero-image-hidden"
+                >
+                <span class="hero-reveal-lens" id="heroRevealLens" aria-hidden="true"></span>
             </div>
             <div class="hero-badges">
-                <span>Conversion Systems</span>
-                <span>Process Automation</span>
-                <span>Intelligent Integration</span>
-                <span>Scalable Platforms</span>
+                <span class="hero-seq-item" data-hero-step="4">Conversion Systems</span>
+                <span class="hero-seq-item" data-hero-step="5">Process Automation</span>
+                <span class="hero-seq-item" data-hero-step="6">Intelligent Integration</span>
+                <span class="hero-seq-item" data-hero-step="7">Scalable Platforms</span>
             </div>
         </div>
     </div>
@@ -59,23 +51,23 @@
 
 <section id="about" class="section-gap">
     <div class="container mx-auto px-4 grid lg:grid-cols-[1.2fr_1fr] gap-8 items-center">
-        <div class="glass-card reveal">
+        <div class="about-text-block">
             <h2 class="section-title">About Me</h2>
-            <p class="mt-4 text-muted">Hi, I’m Md Adeen Hussain — a web developer focused on helping businesses grow through structured and intelligent digital systems. I don’t approach projects with the mindset of simply “building a website.” Instead, I work to create strong digital foundations that support visibility, credibility, and long-term scalability. Every business deserves more than an online presence — it needs a system that attracts the right audience, builds trust, and converts attention into measurable results.</p>
-            <p class="mt-4 text-muted">With a background in Computer Science and hands-on experience in full-stack development, I build performance-driven platforms that combine clean design, secure architecture, and strategic functionality. Whether it’s developing a conversion-focused website, implementing e-commerce infrastructure, integrating automation, or optimizing backend systems, my goal is always to create solutions that operate smoothly and efficiently behind the scenes.</p>
-            <p class="mt-4 text-muted">I believe growth is engineered through clarity, structure, and consistency. Technology should simplify operations, strengthen brand authority, and support smarter decision-making. When I work with a business, I focus on understanding its objectives first — then designing a digital system that aligns with those goals and evolves as the business grows.</p>
+            <p class="mt-4 text-muted about-seq-item about-para-item">Hi, I’m Md Adeen Hussain — a web developer focused on helping businesses grow through structured and intelligent digital systems. I don’t approach projects with the mindset of simply “building a website.” Instead, I work to create strong digital foundations that support visibility, credibility, and long-term scalability. Every business deserves more than an online presence — it needs a system that attracts the right audience, builds trust, and converts attention into measurable results.</p>
+            <p class="mt-4 text-muted about-seq-item about-para-item">With a background in Computer Science and hands-on experience in full-stack development, I build performance-driven platforms that combine clean design, secure architecture, and strategic functionality. Whether it’s developing a conversion-focused website, implementing e-commerce infrastructure, integrating automation, or optimizing backend systems, my goal is always to create solutions that operate smoothly and efficiently behind the scenes.</p>
+            <p class="mt-4 text-muted about-seq-item about-para-item">I believe growth is engineered through clarity, structure, and consistency. Technology should simplify operations, strengthen brand authority, and support smarter decision-making. When I work with a business, I focus on understanding its objectives first — then designing a digital system that aligns with those goals and evolves as the business grows.</p>
         </div>
-        <div class="glass-card reveal">
-            <h3 class="text-xl font-bold">Why Clients Hire Me</h3>
+        <div class="about-list-block">
+            <h3 class="text-xl font-bold about-seq-item about-list-item">Why Clients Hire Me</h3>
             <ul class="feature-list mt-4">
-                <li>Growth-focused solutions, not just websites</li>
-                <li>Scalable and structured digital systems</li>
-                <li>Clean design with secure backend architecture</li>
-                <li>Automation that saves time and improves efficiency</li>
-                <li>Performance-optimized and conversion-driven builds</li>
-                <li>Strategic approach aligned with business goals</li>
-                <li>Reliable long-term support and maintenance</li>
-                <li>Professional communication and systematic execution</li>
+                <li class="about-seq-item about-list-item">Growth-focused solutions, not just websites</li>
+                <li class="about-seq-item about-list-item">Scalable and structured digital systems</li>
+                <li class="about-seq-item about-list-item">Clean design with secure backend architecture</li>
+                <li class="about-seq-item about-list-item">Automation that saves time and improves efficiency</li>
+                <li class="about-seq-item about-list-item">Performance-optimized and conversion-driven builds</li>
+                <li class="about-seq-item about-list-item">Strategic approach aligned with business goals</li>
+                <li class="about-seq-item about-list-item">Reliable long-term support and maintenance</li>
+                <li class="about-seq-item about-list-item">Professional communication and systematic execution</li>
             </ul>
         </div>
     </div>
@@ -87,28 +79,28 @@
             <h2 class="section-title">Digital Systems Designed for Growth-Driven Businesses</h2>
             <p class="section-sub">Strategic web platforms, automation infrastructure, and intelligent systems built to help businesses operate smarter, convert better, and scale with confidence.</p>
         </div>
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
-            <article class="service-card tilt-card reveal">
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8" data-scroll-seq>
+            <article class="service-card tilt-card scroll-seq-item">
                 <h3>Website Development</h3>
                 <p>I build conversion-focused, performance-optimized websites engineered for credibility, speed, and long-term scalability. Every build combines clean design, secure backend architecture, and structured user journeys that turn visitors into customers.</p>
             </article>
-            <article class="service-card tilt-card reveal">
+            <article class="service-card tilt-card scroll-seq-item">
                 <h3>E-Commerce Development</h3>
                 <p>From product architecture to secure payment integration and analytics foundations, I develop e-commerce systems designed for growth. Built to handle traffic, optimize conversions, and support operational efficiency as your store expands.</p>
             </article>
-            <article class="service-card tilt-card reveal">
+            <article class="service-card tilt-card scroll-seq-item">
                 <h3>Python Automation</h3>
                 <p>Custom automation solutions that reduce manual work, eliminate repetitive tasks, and improve operational accuracy. From CRM workflows to reporting pipelines and system integrations, I build processes that save time and increase efficiency.</p>
             </article>
-            <article class="service-card tilt-card reveal">
+            <article class="service-card tilt-card scroll-seq-item">
                 <h3>AI Chatbot Systems</h3>
                 <p>AI-powered assistants designed to handle inquiries, qualify leads, and streamline customer communication. Integrated with your systems to improve response time, engagement, and conversion opportunities.</p>
             </article>
-            <article class="service-card tilt-card reveal">
+            <article class="service-card tilt-card scroll-seq-item">
                 <h3>SEO Services</h3>
                 <p>I implement structured SEO foundations that improve visibility, performance, and search rankings. From technical optimization to content structure and site architecture, everything is built for sustainable organic growth.</p>
             </article>
-            <article class="service-card tilt-card reveal">
+            <article class="service-card tilt-card scroll-seq-item">
                 <h3>Retention & Growth Engineering</h3>
                 <p>Beyond launch, I help businesses refine and improve performance through analytics setup, performance monitoring, and A/B-ready infrastructure. Continuous improvement leads to long-term growth and measurable impact.</p>
             </article>
@@ -185,7 +177,7 @@
         </div>
 
         {% for category, plans in plans_by_category.items() %}
-        <div class="plans-category mt-10" data-plans-scope>
+        <div class="plans-category mt-10" data-plans-scope data-scroll-seq>
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h3 class="category-title reveal">{{ category }}</h3>
                 <div class="pricing-toggle reveal" role="group" aria-label="{{ category }} pricing mode">
@@ -195,7 +187,7 @@
             </div>
             <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
                 {% for plan in plans %}
-                <article class="plan-card reveal tilt-card {% if plan.is_recommended %}recommended{% endif %}" data-plan-flip>
+                <article class="plan-card scroll-seq-item tilt-card {% if plan.is_recommended %}recommended{% endif %}" data-plan-flip>
                     <div class="plan-card-inner">
                         <div class="plan-face plan-face-front">
                             {% if plan.is_recommended %}<span class="recommended-badge">Recommended</span>{% endif %}
@@ -263,9 +255,9 @@
             </div>
             <a href="{{ url_for('main.portfolio') }}" class="capsule-btn capsule-secondary">View All</a>
         </div>
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8" data-scroll-seq>
             {% for project in featured_projects %}
-            <article id="{{ project.slug }}" class="portfolio-card reveal skeleton">
+            <article id="{{ project.slug }}" class="portfolio-card scroll-seq-item skeleton">
                 <img loading="lazy" src="{{ project.cover_image or 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ project.title }}" class="portfolio-image">
                 <div class="p-5">
                     <h3 class="text-lg font-bold">{{ project.title }}</h3>
@@ -281,9 +273,9 @@
 <section id="testimonials" class="section-gap">
     <div class="container mx-auto px-4">
         <h2 class="section-title reveal">Client Testimonials</h2>
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8" data-scroll-seq>
             {% for t in testimonials %}
-            <article class="glass-card reveal">
+            <article class="glass-card scroll-seq-item">
                 <p class="text-sm text-muted">"{{ t.testimonial }}"</p>
                 <div class="mt-4">
                     <p class="font-semibold">{{ t.client_name }}</p>
@@ -304,9 +296,9 @@
             </div>
             <a href="{{ url_for('main.blog_list') }}" class="capsule-btn capsule-secondary">All Articles</a>
         </div>
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8" data-scroll-seq>
             {% for post in latest_blogs %}
-            <article class="glass-card reveal">
+            <article class="glass-card scroll-seq-item">
                 <h3 class="text-lg font-bold">{{ post.title }}</h3>
                 <p class="text-sm text-muted mt-3">{{ post.excerpt }}</p>
                 <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="inline-block mt-4 text-cyan-300 hover:text-cyan-200 transition">Read More</a>
@@ -317,8 +309,8 @@
 </section>
 
 <section id="contact" class="section-gap">
-    <div class="container mx-auto px-4 grid lg:grid-cols-2 gap-8">
-        <div class="glass-card reveal">
+    <div class="container mx-auto px-4 grid lg:grid-cols-2 gap-8" data-scroll-seq>
+        <div class="glass-card scroll-seq-item">
             <h2 class="section-title">Contact</h2>
             <p class="text-muted mt-3">Tell me about your project and goals. You’ll get a structured response with timeline, scope, and next steps.</p>
             <form id="contactForm" class="mt-6 space-y-4 ajax-form" method="post" enctype="multipart/form-data" data-endpoint="{{ url_for('api.submit_contact') }}">
@@ -344,7 +336,7 @@
             </form>
         </div>
 
-        <div class="glass-card reveal">
+        <div class="glass-card scroll-seq-item">
             <h2 class="section-title">Need a Plan-Specific Proposal?</h2>
             <p class="text-muted mt-3">Use the dedicated inquiry page to submit selected plan details, budget, and timeline with proper context.</p>
             <a href="{{ url_for('main.inquiry_page') }}" class="capsule-btn capsule-secondary mt-6">Open Inquiry Page</a>
