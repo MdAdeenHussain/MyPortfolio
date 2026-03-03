@@ -4,36 +4,54 @@
 <section id="home" class="hero-section pt-12 md:pt-20">
     <div class="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
         <div>
-            <p class="eyebrow mb-5">Freelance Web Developer | Python + Flask + PostgreSQL</p>
+            <p class="eyebrow mb-5">Building Revenue-Driven Digital Platforms</p>
             <h1 class="hero-heading reveal">Building Scalable Digital Systems for Modern Businesses</h1>
-            <p class="hero-sub mt-6 reveal">I design, build, and optimize premium websites, automation workflows, and AI-enabled digital products for startups and global brands.</p>
+            <p class="hero-sub mt-6 reveal">I design and engineer performance-driven websites, automation systems, and AI-powered solutions that help businesses operate smarter, convert better, and scale faster.</p>
             <div class="mt-8 flex flex-wrap gap-4 reveal">
-                <a href="#plans" class="capsule-btn capsule-primary pulse-glow">View Plans</a>
-                <a href="#contact" class="capsule-btn capsule-secondary">Hire Me</a>
+                <a href="#plans" class="capsule-btn capsule-primary pulse-glow">Explore Solutions</a>
+                <a href="#contact" class="capsule-btn capsule-secondary">Start a project</a>
             </div>
             <div class="grid grid-cols-3 gap-4 mt-10 reveal">
                 <div class="stat-card">
-                    <span class="stat-number" data-counter="120">0</span>
-                    <span class="stat-label">Projects</span>
+                    <span class="stat-label">Performance-Optimized Builds</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-number" data-counter="68">0</span>
-                    <span class="stat-label">Clients</span>
+                    <span class="stat-label">Secure Backend Systems</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-number" data-counter="34">0</span>
-                    <span class="stat-label">Technologies</span>
+                    <span class="stat-label">Automation-Driven Solutions</span>
                 </div>
             </div>
             <a href="#about" class="scroll-indicator reveal" aria-label="Scroll to About section">Scroll</a>
         </div>
         <div class="hero-visual reveal">
-            <canvas id="hero3d" class="w-full h-[460px] rounded-3xl"></canvas>
+            <div class="hero-spline hero-character-stage" id="heroCharacterStage" aria-label="Interactive character animation">
+                <div class="hero-character" id="heroCharacter">
+                    <div class="character-shadow"></div>
+                    <div class="character-seat"></div>
+
+                    <div class="character-laptop">
+                        <span class="laptop-screen"></span>
+                        <span class="laptop-base"></span>
+                    </div>
+
+                    <div class="character-body">
+                        <div class="character-head">
+                            <span class="character-eye eye-left"><span class="character-pupil"></span></span>
+                            <span class="character-eye eye-right"><span class="character-pupil"></span></span>
+                        </div>
+                        <div class="character-torso"></div>
+                        <div class="character-arm arm-left"></div>
+                        <div class="character-arm arm-right"></div>
+                    </div>
+                </div>
+                <span class="cursor-orb" id="heroCursorOrb" aria-hidden="true"></span>
+            </div>
             <div class="hero-badges">
-                <span>Web Engineering</span>
-                <span>Automation</span>
-                <span>AI Systems</span>
-                <span>E-Commerce</span>
+                <span>Conversion Systems</span>
+                <span>Process Automation</span>
+                <span>Intelligent Integration</span>
+                <span>Scalable Platforms</span>
             </div>
         </div>
     </div>
@@ -66,33 +84,33 @@
 <section id="services" class="section-gap">
     <div class="container mx-auto px-4">
         <div class="max-w-2xl reveal">
-            <h2 class="section-title">Services</h2>
-            <p class="section-sub">Designed for startups, businesses, e-commerce brands, and automation-heavy operations.</p>
+            <h2 class="section-title">Digital Systems Designed for Growth-Driven Businesses</h2>
+            <p class="section-sub">Strategic web platforms, automation infrastructure, and intelligent systems built to help businesses operate smarter, convert better, and scale with confidence.</p>
         </div>
         <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
             <article class="service-card tilt-card reveal">
                 <h3>Website Development</h3>
-                <p>Premium business websites with strong UX, SEO, and conversion flow.</p>
+                <p>I build conversion-focused, performance-optimized websites engineered for credibility, speed, and long-term scalability. Every build combines clean design, secure backend architecture, and structured user journeys that turn visitors into customers.</p>
             </article>
             <article class="service-card tilt-card reveal">
                 <h3>E-Commerce Development</h3>
-                <p>Scalable commerce systems with product, order, and analytics foundations.</p>
+                <p>From product architecture to secure payment integration and analytics foundations, I develop e-commerce systems designed for growth. Built to handle traffic, optimize conversions, and support operational efficiency as your store expands.</p>
             </article>
             <article class="service-card tilt-card reveal">
                 <h3>Python Automation</h3>
-                <p>Process automation for CRM, operations, reporting, and integration pipelines.</p>
+                <p>Custom automation solutions that reduce manual work, eliminate repetitive tasks, and improve operational accuracy. From CRM workflows to reporting pipelines and system integrations, I build processes that save time and increase efficiency.</p>
             </article>
             <article class="service-card tilt-card reveal">
                 <h3>AI Chatbot Systems</h3>
-                <p>FAQ bots to CRM-integrated assistants with smart lead qualification.</p>
+                <p>AI-powered assistants designed to handle inquiries, qualify leads, and streamline customer communication. Integrated with your systems to improve response time, engagement, and conversion opportunities.</p>
             </article>
             <article class="service-card tilt-card reveal">
                 <h3>SEO Services</h3>
-                <p>Technical and growth SEO systems to improve rankings and inbound revenue.</p>
+                <p>I implement structured SEO foundations that improve visibility, performance, and search rankings. From technical optimization to content structure and site architecture, everything is built for sustainable organic growth.</p>
             </article>
             <article class="service-card tilt-card reveal">
                 <h3>Retention & Growth Engineering</h3>
-                <p>Data-driven improvement cycles, analytics instrumentation, and A/B-ready setup.</p>
+                <p>Beyond launch, I help businesses refine and improve performance through analytics setup, performance monitoring, and A/B-ready infrastructure. Continuous improvement leads to long-term growth and measurable impact.</p>
             </article>
         </div>
     </div>
@@ -184,6 +202,15 @@
                             <p class="text-xs uppercase tracking-wider text-cyan-300">One-Time Build</p>
                             <h4 class="plan-name">{{ plan.name }}</h4>
                             <p class="plan-price">{{ plan.one_time_display }}</p>
+                            {% if plan.one_time_has_breakdown %}
+                            <div class="gst-breakdown">
+                                <p><span>Base</span><strong>{{ plan.one_time_base_display }}</strong></p>
+                                <p><span>GST (18%)</span><strong>{{ plan.one_time_gst_display }}</strong></p>
+                                <p class="gst-total"><span>Total Payable</span><strong>{{ plan.one_time_total_display }}</strong></p>
+                            </div>
+                            {% else %}
+                            <p class="gst-note">{{ plan.one_time_note }}</p>
+                            {% endif %}
                             <p class="text-xs uppercase tracking-wider text-cyan-300 mt-4">Best For</p>
                             <p class="text-sm text-muted mt-1">{{ plan.best_for }}</p>
                             <ul class="feature-list mt-4">
@@ -191,13 +218,22 @@
                                 <li>{{ feature }}</li>
                                 {% endfor %}
                             </ul>
-                            <a href="#inquiry" class="capsule-btn capsule-secondary mt-5">Get Started</a>
+                            <a href="{{ url_for('main.inquiry_page', service_type=plan.category, plan_name=plan.name) }}" class="capsule-btn capsule-secondary mt-5">Get Started</a>
                         </div>
                         <div class="plan-face plan-face-back">
                             {% if plan.is_recommended %}<span class="recommended-badge">Recommended</span>{% endif %}
                             <p class="text-xs uppercase tracking-wider text-cyan-300">Monthly Maintenance</p>
                             <h4 class="plan-name">{{ plan.name }}</h4>
                             <p class="plan-price">{{ plan.maintenance_price }}</p>
+                            {% if plan.maintenance_has_breakdown %}
+                            <div class="gst-breakdown">
+                                <p><span>Base</span><strong>{{ plan.maintenance_base_display }}</strong></p>
+                                <p><span>GST (18%)</span><strong>{{ plan.maintenance_gst_display }}</strong></p>
+                                <p class="gst-total"><span>Total Payable</span><strong>{{ plan.maintenance_total_display }}</strong></p>
+                            </div>
+                            {% else %}
+                            <p class="gst-note">{{ plan.maintenance_note }}</p>
+                            {% endif %}
                             <p class="text-xs uppercase tracking-wider text-cyan-300 mt-4">Best For</p>
                             <p class="text-sm text-muted mt-1">{{ plan.maintenance_best_for }}</p>
                             <p class="text-sm text-muted mt-3">{{ plan.maintenance_description }}</p>
@@ -207,7 +243,7 @@
                                 <li>{{ feature }}</li>
                                 {% endfor %}
                             </ul>
-                            <a href="#inquiry" class="capsule-btn capsule-secondary mt-5">Get Started</a>
+                            <a href="{{ url_for('main.inquiry_page', service_type=plan.category, plan_name=plan.name) }}" class="capsule-btn capsule-secondary mt-5">Get Started</a>
                         </div>
                     </div>
                 </article>
@@ -308,31 +344,10 @@
             </form>
         </div>
 
-        <div id="inquiry" class="glass-card reveal">
-            <h2 class="section-title">Client Inquiry Form</h2>
-            <p class="text-muted mt-3">Best for detailed plan-specific inquiries.</p>
-            <form id="inquiryForm" class="mt-6 space-y-4 ajax-form" method="post" data-endpoint="{{ url_for('api.submit_inquiry') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="grid md:grid-cols-2 gap-4">
-                    <input name="full_name" required type="text" placeholder="Full Name *" class="input-field">
-                    <input name="email" required type="email" placeholder="Email *" class="input-field">
-                </div>
-                <select name="service_type" required class="input-field">
-                    <option value="">Service Type *</option>
-                    <option>Website Development</option>
-                    <option>E-Commerce Development</option>
-                    <option>Python Automation</option>
-                    <option>AI Chatbot</option>
-                    <option>SEO Services</option>
-                </select>
-                <input name="plan_name" required type="text" placeholder="Chosen Plan *" class="input-field">
-                <div class="grid md:grid-cols-2 gap-4">
-                    <input name="timeline" type="text" placeholder="Timeline" class="input-field">
-                    <input name="budget" type="text" placeholder="Budget" class="input-field">
-                </div>
-                <textarea name="project_details" required rows="5" placeholder="Project Details *" class="input-field"></textarea>
-                <button type="submit" class="capsule-btn capsule-primary w-full">Send Inquiry</button>
-            </form>
+        <div class="glass-card reveal">
+            <h2 class="section-title">Need a Plan-Specific Proposal?</h2>
+            <p class="text-muted mt-3">Use the dedicated inquiry page to submit selected plan details, budget, and timeline with proper context.</p>
+            <a href="{{ url_for('main.inquiry_page') }}" class="capsule-btn capsule-secondary mt-6">Open Inquiry Page</a>
         </div>
     </div>
 </section>
@@ -352,9 +367,4 @@
   "knowsAbout": ["Flask", "PostgreSQL", "Web Development", "Automation", "AI Chatbots", "SEO"]
 }
 </script>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
-<script src="{{ url_for('static', filename='js/three-hero.js') }}"></script>
 {% endblock %}

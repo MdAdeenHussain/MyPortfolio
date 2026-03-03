@@ -45,7 +45,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>{% block title %}Md Adeen Hussain | Premium Web Developer{% endblock %}</title>
 </head>
-<body class="page-transition bg-app text-app">
+<body class="public-page page-transition bg-app text-app">
     <div class="noise-overlay"></div>
     {% include "components/navbar.html" %}
 
@@ -65,6 +65,11 @@
 
     {% include "components/footer.html" %}
 
+    <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Scroll to top">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5l6.6 7.1-1.5 1.4-4-4.3V19h-2.2V9.2l-4 4.3-1.5-1.4L12 5z"></path>
+        </svg>
+    </button>
     <div id="toast" class="toast"></div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}

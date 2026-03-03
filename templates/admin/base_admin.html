@@ -23,21 +23,56 @@
     <title>{% block title %}Admin Dashboard{% endblock %}</title>
 </head>
 <body class="bg-app text-app">
+    <div class="noise-overlay"></div>
     <header class="site-header sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
             <a href="{{ url_for('admin.dashboard') }}" class="logo-link">Admin Dashboard</a>
             <div class="flex items-center gap-3">
                 <span class="text-sm text-muted hidden md:block">{{ current_user.email if current_user.is_authenticated else '' }}</span>
-                <button id="themeToggle" type="button" class="theme-toggle" aria-label="Toggle theme"><span class="toggle-thumb"></span></button>
+                <button id="themeToggle" type="button" class="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon sun-icon" aria-hidden="true">☀</span>
+                    <span class="theme-icon moon-icon" aria-hidden="true">☾</span>
+                    <span class="toggle-thumb"></span>
+                </button>
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('admin.logout') }}" class="capsule-btn capsule-secondary">Logout</a>
+                <a href="{{ url_for('admin.logout') }}" class="capsule-btn capsule-secondary hidden lg:inline-flex">Logout</a>
+                <button
+                    id="adminMenuToggle"
+                    type="button"
+                    class="menu-toggle lg:hidden"
+                    data-menu-target="adminMobileMenu"
+                    aria-controls="adminMobileMenu"
+                    aria-expanded="false"
+                    aria-label="Toggle admin menu"
+                >
+                    <span class="menu-toggle-bar"></span>
+                    <span class="menu-toggle-bar"></span>
+                    <span class="menu-toggle-bar"></span>
+                </button>
                 {% endif %}
             </div>
         </div>
+        {% if current_user.is_authenticated %}
+        <div id="adminMobileMenu" class="mobile-menu-panel lg:hidden">
+            <nav class="container mx-auto px-4 pb-4 mobile-menu-links">
+                <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link" data-menu-close>Dashboard</a>
+                <a href="{{ url_for('admin.leads') }}" class="admin-nav-link" data-menu-close>Leads</a>
+                <a href="{{ url_for('admin.inquiries') }}" class="admin-nav-link" data-menu-close>Inquiries</a>
+                <a href="{{ url_for('admin.past_clients') }}" class="admin-nav-link" data-menu-close>Past Clients</a>
+                <a href="{{ url_for('admin.blogs') }}" class="admin-nav-link" data-menu-close>Blogs</a>
+                <a href="{{ url_for('admin.projects') }}" class="admin-nav-link" data-menu-close>Projects</a>
+                <a href="{{ url_for('admin.testimonials') }}" class="admin-nav-link" data-menu-close>Testimonials</a>
+                <a href="{{ url_for('admin.plans') }}" class="admin-nav-link" data-menu-close>Plans</a>
+                <a href="{{ url_for('admin.settings') }}" class="admin-nav-link" data-menu-close>Settings</a>
+                <a href="{{ url_for('main.home') }}" class="admin-nav-link" data-menu-close>View Site</a>
+                <a href="{{ url_for('admin.logout') }}" class="admin-nav-link" data-menu-close>Logout</a>
+            </nav>
+        </div>
+        {% endif %}
     </header>
 
     {% if current_user.is_authenticated %}
-    <nav class="container mx-auto px-4 py-4">
+    <nav class="container mx-auto px-4 py-4 hidden lg:block">
         <div class="glass-card p-3 flex flex-wrap gap-2">
             <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link">Dashboard</a>
             <a href="{{ url_for('admin.leads') }}" class="admin-nav-link">Leads</a>
@@ -66,6 +101,11 @@
         {% block content %}{% endblock %}
     </main>
 
+    <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Scroll to top">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5l6.6 7.1-1.5 1.4-4-4.3V19h-2.2V9.2l-4 4.3-1.5-1.4L12 5z"></path>
+        </svg>
+    </button>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
     {% block scripts %}{% endblock %}

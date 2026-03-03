@@ -19,7 +19,7 @@
             <input name="facebook_url" type="text" class="input-field" placeholder="Facebook URL"
                 value="{{ settings_row.facebook_url or '' }}">
             <input name="whatsapp_number" type="text" class="input-field" placeholder="WhatsApp Number"
-                value="{{ settings_row.whatsapp_number or '+91 9674667587' }}">
+                value="{{ settings_row.whatsapp_number or site_settings.whatsapp_number }}">
 
             <button type="submit" class="capsule-btn capsule-primary">Save Settings</button>
         </form>

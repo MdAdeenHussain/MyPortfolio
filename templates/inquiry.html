@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Client Inquiry | Md Adeen Hussain{% endblock %}
+{% block content %}
+<section class="section-gap pt-14">
+    <div class="container mx-auto px-4 grid lg:grid-cols-2 gap-8">
+        <div class="glass-card reveal">
+            <h1 class="section-title">Client Inquiry Form</h1>
+            <p class="text-muted mt-3">Share your service scope, selected plan, and project goals. You will get a structured response with timeline and next steps.</p>
+
+            {% if selected_service or selected_plan %}
+            <div class="mt-5 p-4 rounded-2xl border border-cyan-400/30 bg-cyan-500/10">
+                <p class="text-xs uppercase tracking-wider text-cyan-300">Selected Plan Context</p>
+                <p class="text-sm text-muted mt-2">
+                    Service: <span class="text-app font-semibold">{{ selected_service or '-' }}</span><br>
+                    Plan: <span class="text-app font-semibold">{{ selected_plan or '-' }}</span>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="glass-card reveal">
+            <form id="inquiryForm" class="space-y-4 ajax-form" method="post" data-endpoint="{{ url_for('api.submit_inquiry') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <input name="full_name" required type="text" placeholder="Full Name *" class="input-field">
+                    <input name="email" required type="email" placeholder="Email *" class="input-field">
+                </div>
+
+                <select id="serviceTypeSelect" name="service_type" required class="input-field" data-initial-service="{{ selected_service }}">
+                    <option value="">Service Type *</option>
+                    {% for option in service_options %}
+                    <option value="{{ option }}" {% if selected_service == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="planNameSelect" name="plan_name" required class="input-field" data-initial-plan="{{ selected_plan }}">
+                    <option value="">Chosen Plan *</option>
+                </select>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <input name="timeline" type="text" placeholder="Timeline" class="input-field">
+                    <input name="budget" type="text" placeholder="Budget" class="input-field">
+                </div>
+
+                <textarea name="project_details" required rows="6" placeholder="Project Details *" class="input-field"></textarea>
+                <button type="submit" class="capsule-btn capsule-primary w-full">Send Inquiry</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const plansByService = {{ plans_by_service | tojson }};
+        const serviceSelect = document.getElementById("serviceTypeSelect");
+        const planSelect = document.getElementById("planNameSelect");
+        if (!serviceSelect || !planSelect) return;
+
+        const initialService = serviceSelect.dataset.initialService || "";
+        const initialPlan = planSelect.dataset.initialPlan || "";
+
+        const normalize = (value) => (value || "").trim().toLowerCase();
+
+        const renderPlanOptions = (serviceType, preselectPlan = "") => {
+            const options = plansByService[serviceType] || [];
+            planSelect.innerHTML = '<option value="">Chosen Plan *</option>';
+
+            options.forEach((plan) => {
+                const option = document.createElement("option");
+                option.value = plan.name;
+                option.textContent = plan.label;
+                planSelect.appendChild(option);
+            });
+
+            const selected = options.find((plan) => normalize(plan.name) === normalize(preselectPlan));
+            if (selected) {
+                planSelect.value = selected.name;
+            }
+        };
+
+        serviceSelect.addEventListener("change", () => {
+            renderPlanOptions(serviceSelect.value, "");
+        });
+
+        if (initialService) {
+            serviceSelect.value = initialService;
+        }
+        renderPlanOptions(serviceSelect.value, initialPlan);
+    })();
+</script>
+{% endblock %}

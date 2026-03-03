@@ -4,6 +4,7 @@
 <section class="pt-4 grid xl:grid-cols-[1fr_1fr] gap-6">
     <article class="glass-card p-5">
         <h1 class="section-title text-2xl">{{ 'Edit Plan' if plan_to_edit else 'Add Plan' }}</h1>
+        <p class="text-xs text-muted mt-1">GST is auto-calculated at 18% and shown in the catalog cards after saving.</p>
         <form method="post" class="space-y-3 mt-4">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if plan_to_edit %}<input type="hidden" name="id" value="{{ plan_to_edit.id }}">{% endif %}
@@ -26,7 +27,28 @@
             {% for plan in plans %}
             <div class="p-4 rounded-xl border border-white/10">
                 <h3 class="font-semibold">{{ plan.category }} · {{ plan.name }}</h3>
-                <p class="text-xs text-muted">{{ plan.price_one_time or '—' }} | {{ plan.price_monthly or '—' }}</p>
+                <div class="mt-3 grid md:grid-cols-2 gap-3">
+                    <div class="gst-breakdown">
+                        <p class="text-[11px] uppercase tracking-wider text-cyan-300"><span>One-Time</span><strong>{{ plan.one_time_display }}</strong></p>
+                        {% if plan.one_time_has_breakdown %}
+                        <p><span>Base</span><strong>{{ plan.one_time_base }}</strong></p>
+                        <p><span>GST (18%)</span><strong>{{ plan.one_time_gst }}</strong></p>
+                        <p class="gst-total"><span>Total</span><strong>{{ plan.one_time_total }}</strong></p>
+                        {% else %}
+                        <p><span>Not configured</span><strong>—</strong></p>
+                        {% endif %}
+                    </div>
+                    <div class="gst-breakdown">
+                        <p class="text-[11px] uppercase tracking-wider text-cyan-300"><span>Monthly</span><strong>{{ plan.monthly_display }}</strong></p>
+                        {% if plan.monthly_has_breakdown %}
+                        <p><span>Base</span><strong>{{ plan.monthly_base }}</strong></p>
+                        <p><span>GST (18%)</span><strong>{{ plan.monthly_gst }}</strong></p>
+                        <p class="gst-total"><span>Total</span><strong>{{ plan.monthly_total }}</strong></p>
+                        {% else %}
+                        <p><span>Not configured</span><strong>—</strong></p>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="mt-3 flex gap-3">
                     <a href="{{ url_for('admin.plans', edit=plan.id) }}" class="text-cyan-300 hover:text-cyan-200">Edit</a>
                     <form method="post" action="{{ url_for('admin.delete_plan', plan_id=plan.id) }}" onsubmit="return confirm('Delete this plan?')">

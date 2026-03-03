@@ -10,8 +10,36 @@
             <a href="{{ url_for('main.blog_list') }}" class="nav-link">Blog</a>
             <a href="{{ url_for('main.home') }}#contact" class="nav-link">Contact</a>
         </nav>
-        <button id="themeToggle" type="button" class="theme-toggle" aria-label="Toggle theme">
-            <span class="toggle-thumb"></span>
-        </button>
+        <div class="flex items-center gap-2">
+            <button id="themeToggle" type="button" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon sun-icon" aria-hidden="true">☀</span>
+                <span class="theme-icon moon-icon" aria-hidden="true">☾</span>
+                <span class="toggle-thumb"></span>
+            </button>
+            <button
+                id="siteMenuToggle"
+                type="button"
+                class="menu-toggle lg:hidden"
+                data-menu-target="siteMobileMenu"
+                aria-controls="siteMobileMenu"
+                aria-expanded="false"
+                aria-label="Toggle navigation menu"
+            >
+                <span class="menu-toggle-bar"></span>
+                <span class="menu-toggle-bar"></span>
+                <span class="menu-toggle-bar"></span>
+            </button>
+        </div>
+    </div>
+    <div id="siteMobileMenu" class="mobile-menu-panel lg:hidden">
+        <nav class="container mx-auto px-4 pb-4 mobile-menu-links">
+            <a href="{{ url_for('main.home') }}#home" class="nav-link" data-menu-close>Home</a>
+            <a href="{{ url_for('main.home') }}#about" class="nav-link" data-menu-close>About</a>
+            <a href="{{ url_for('main.home') }}#services" class="nav-link" data-menu-close>Services</a>
+            <a href="{{ url_for('main.home') }}#plans" class="nav-link" data-menu-close>Plans</a>
+            <a href="{{ url_for('main.home') }}#portfolio" class="nav-link" data-menu-close>Portfolio</a>
+            <a href="{{ url_for('main.blog_list') }}" class="nav-link" data-menu-close>Blog</a>
+            <a href="{{ url_for('main.home') }}#contact" class="nav-link" data-menu-close>Contact</a>
+        </nav>
     </div>
 </header>

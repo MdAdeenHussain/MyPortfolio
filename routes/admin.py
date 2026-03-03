@@ -1,5 +1,6 @@
 import csv
 import io
+import os
 from datetime import datetime, timedelta
 
 from flask import (
@@ -32,6 +33,8 @@ from models import (
 )
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+DEFAULT_WHATSAPP_NUMBER = os.getenv("WHATSAPP_NUMBER", "+91 9674667587")
+GST_RATE = 0.18
 
 
 def log_action(action, entity, entity_id=0):
@@ -71,7 +74,7 @@ def get_or_create_site_settings():
     settings = SiteSettings.query.first()
     if settings:
         return settings
-    settings = SiteSettings(whatsapp_number="+91 9674667587")
+    settings = SiteSettings(whatsapp_number=DEFAULT_WHATSAPP_NUMBER)
     db.session.add(settings)
     db.session.flush()
     return settings
@@ -94,6 +97,54 @@ def parse_iso_date(raw_value):
         return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError:
         return None
+
+
+def parse_price_value(raw_price):
+    text = (raw_price or "").strip()
+    if not text:
+        return None
+
+    digits_only = "".join(ch for ch in text if ch.isdigit())
+    if not digits_only:
+        return None
+
+    numeric_value = int(digits_only)
+    if numeric_value <= 0:
+        return None
+
+    adjusted_value = max(numeric_value - 1, 0)
+    suffix = "/month" if "/month" in text.lower() else ""
+    has_plus = "+" in text
+    return {"value": adjusted_value, "suffix": suffix, "has_plus": has_plus}
+
+
+def format_inr(value):
+    return f"₹{value:,}"
+
+
+def get_price_breakdown(raw_price):
+    parsed = parse_price_value(raw_price)
+    if not parsed:
+        return {
+            "display": "—",
+            "base": "",
+            "gst": "",
+            "total": "",
+            "has_breakdown": False,
+        }
+
+    value = parsed["value"]
+    gst_amount = round(value * GST_RATE)
+    total_amount = value + gst_amount
+    plus_suffix = "+" if parsed["has_plus"] else ""
+    period_suffix = parsed["suffix"]
+    return {
+        "display": f"{format_inr(value)}{plus_suffix}{period_suffix}",
+        "base": f"{format_inr(value)}{plus_suffix}{period_suffix}",
+        "gst": f"{format_inr(gst_amount)}{plus_suffix}{period_suffix}",
+        "total": f"{format_inr(total_amount)}{plus_suffix}{period_suffix}",
+        "has_breakdown": True,
+    }
 
 
 def build_past_clients_rows(search_query="", source_filter=""):
@@ -862,6 +913,19 @@ def plans():
         return redirect(url_for("admin.plans"))
 
     rows = PlanCatalog.query.order_by(PlanCatalog.category, PlanCatalog.id).all()
+    for row in rows:
+        one_time = get_price_breakdown(row.price_one_time)
+        monthly = get_price_breakdown(row.price_monthly)
+        row.one_time_display = one_time["display"]
+        row.one_time_base = one_time["base"]
+        row.one_time_gst = one_time["gst"]
+        row.one_time_total = one_time["total"]
+        row.one_time_has_breakdown = one_time["has_breakdown"]
+        row.monthly_display = monthly["display"]
+        row.monthly_base = monthly["base"]
+        row.monthly_gst = monthly["gst"]
+        row.monthly_total = monthly["total"]
+        row.monthly_has_breakdown = monthly["has_breakdown"]
     return render_template("admin/plans.html", plans=rows, plan_to_edit=plan_to_edit)
 
 
@@ -896,7 +960,7 @@ def settings():
             settings_row.x_url = normalize_url(request.form.get("x_url", ""))
             settings_row.linkedin_url = normalize_url(request.form.get("linkedin_url", ""))
             settings_row.facebook_url = normalize_url(request.form.get("facebook_url", ""))
-            settings_row.whatsapp_number = request.form.get("whatsapp_number", "").strip() or "+91 9674667587"
+            settings_row.whatsapp_number = request.form.get("whatsapp_number", "").strip() or DEFAULT_WHATSAPP_NUMBER
 
             log_action("Updated site settings", "SiteSettings", settings_row.id)
             db.session.commit()
@@ -936,6 +1000,8 @@ def settings():
             current_user.full_name = full_name
             current_user.email = email
             current_user.phone_number = phone_number
+            if phone_number:
+                settings_row.whatsapp_number = phone_number
             log_action("Updated admin credentials", "AdminUser", current_user.id)
             db.session.commit()
             flash("Credentials updated successfully.", "success")

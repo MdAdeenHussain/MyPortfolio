@@ -1,4 +1,5 @@
 import re
+import os
 from datetime import datetime
 
 from flask_login import UserMixin
@@ -188,7 +189,7 @@ class SiteSettings(db.Model, TimestampMixin):
     x_url = db.Column(db.String(255), default="")
     linkedin_url = db.Column(db.String(255), default="")
     facebook_url = db.Column(db.String(255), default="")
-    whatsapp_number = db.Column(db.String(30), default="+91 9674667587")
+    whatsapp_number = db.Column(db.String(30), default=lambda: os.getenv("WHATSAPP_NUMBER", "+91 9674667587"))
 
 
 # Optional E-Commerce module

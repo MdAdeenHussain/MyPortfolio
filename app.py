@@ -26,20 +26,24 @@ from models import (
     Testimonials,
 )
 
+DEFAULT_WHATSAPP_NUMBER = os.getenv("WHATSAPP_NUMBER", "+91 9674667587")
+DEFAULT_CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", os.getenv("ADMIN_EMAIL", "hello@adeen.dev"))
+DEFAULT_WHATSAPP_DIGITS = re.sub(r"\D", "", DEFAULT_WHATSAPP_NUMBER) or "919674667587"
 
 DEFAULT_SITE_SETTINGS = {
     "instagram_url": "",
     "x_url": "",
     "linkedin_url": "",
     "facebook_url": "",
-    "whatsapp_number": "+91 9674667587",
+    "whatsapp_number": DEFAULT_WHATSAPP_NUMBER,
+    "contact_email": DEFAULT_CONTACT_EMAIL,
 }
 
 
 def whatsapp_link_from_number(raw_number):
     digits = re.sub(r"\D", "", raw_number or "")
     if not digits:
-        digits = "919674667587"
+        digits = DEFAULT_WHATSAPP_DIGITS
     message = quote("Hi Adeen, I want to discuss a project.")
     return f"https://wa.me/{digits}?text={message}"
 
@@ -54,6 +58,9 @@ def get_site_settings_payload():
             payload["linkedin_url"] = settings.linkedin_url or payload["linkedin_url"]
             payload["facebook_url"] = settings.facebook_url or payload["facebook_url"]
             payload["whatsapp_number"] = settings.whatsapp_number or payload["whatsapp_number"]
+        admin = AdminUser.query.order_by(AdminUser.id.asc()).first()
+        if admin and admin.email:
+            payload["contact_email"] = admin.email
     except SQLAlchemyError:
         # During first boot or migration race, keep defaults.
         pass
@@ -175,6 +182,7 @@ def create_app(config_name=None):
             "site_settings": site_settings,
             "social_links": site_settings["social_links"],
             "whatsapp_chat_link": site_settings["whatsapp_chat_link"],
+            "contact_email": site_settings["contact_email"],
             "policy_links": [
                 {"label": "Terms & Conditions", "href": url_for("main.terms_and_conditions")},
                 {"label": "Privacy Policy", "href": url_for("main.privacy_policy")},
@@ -194,10 +202,11 @@ def create_app(config_name=None):
         ] = (
             "default-src 'self'; "
             "img-src 'self' data: https:; "
-            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com https://unpkg.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
             "font-src 'self' https://fonts.gstatic.com data:; "
-            "connect-src 'self';"
+            "connect-src 'self' https://prod.spline.design https://*.spline.design; "
+            "worker-src 'self' blob:;"
         )
         if os.getenv("FLASK_ENV") == "production":
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"

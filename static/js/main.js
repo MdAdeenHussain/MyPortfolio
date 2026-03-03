@@ -17,6 +17,69 @@
         });
     }
 
+    const scrollTopBtn = document.getElementById("scrollTopBtn");
+    if (scrollTopBtn) {
+        const toggleScrollTopVisibility = () => {
+            scrollTopBtn.classList.toggle("is-visible", window.scrollY > 280);
+        };
+
+        scrollTopBtn.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        window.addEventListener("scroll", toggleScrollTopVisibility, { passive: true });
+        toggleScrollTopVisibility();
+    }
+
+    const menuToggles = document.querySelectorAll("[data-menu-target]");
+    menuToggles.forEach((toggle) => {
+        const menuId = toggle.dataset.menuTarget;
+        const menu = document.getElementById(menuId);
+        if (!menu) {
+            return;
+        }
+
+        const setMenuOpen = (isOpen) => {
+            toggle.classList.toggle("is-open", isOpen);
+            menu.classList.toggle("is-open", isOpen);
+            toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        };
+
+        const closeMenu = () => setMenuOpen(false);
+
+        setMenuOpen(false);
+
+        toggle.addEventListener("click", (event) => {
+            event.stopPropagation();
+            setMenuOpen(!menu.classList.contains("is-open"));
+        });
+
+        menu.querySelectorAll("[data-menu-close]").forEach((item) => {
+            item.addEventListener("click", closeMenu);
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!menu.classList.contains("is-open")) {
+                return;
+            }
+            if (!menu.contains(event.target) && !toggle.contains(event.target)) {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closeMenu();
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            if (window.innerWidth >= 1024) {
+                closeMenu();
+            }
+        });
+    });
+
     const showToast = (message, timeout = 3800) => {
         const toast = document.getElementById("toast");
         if (!toast) {
@@ -41,6 +104,54 @@
             { threshold: 0.15 }
         );
         revealItems.forEach((item) => observer.observe(item));
+    }
+
+    const heroCharacterStage = document.getElementById("heroCharacterStage");
+    const heroCursorOrb = document.getElementById("heroCursorOrb");
+    if (heroCharacterStage) {
+        const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+        const setCharacterVector = (mx, my) => {
+            heroCharacterStage.style.setProperty("--mx", mx.toFixed(3));
+            heroCharacterStage.style.setProperty("--my", my.toFixed(3));
+        };
+
+        const updateFromPointer = (clientX, clientY) => {
+            const rect = heroCharacterStage.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            const nx = clamp((x / rect.width) * 2 - 1, -1, 1);
+            const ny = clamp((y / rect.height) * 2 - 1, -1, 1);
+            setCharacterVector(nx, ny);
+
+            if (heroCursorOrb) {
+                heroCursorOrb.style.left = `${x}px`;
+                heroCursorOrb.style.top = `${y}px`;
+                heroCursorOrb.style.opacity = "1";
+            }
+        };
+
+        const resetCharacter = () => {
+            setCharacterVector(0, 0);
+            if (heroCursorOrb) {
+                heroCursorOrb.style.opacity = "0";
+            }
+        };
+
+        heroCharacterStage.addEventListener("mousemove", (event) => {
+            updateFromPointer(event.clientX, event.clientY);
+        });
+
+        heroCharacterStage.addEventListener("touchmove", (event) => {
+            const touch = event.touches && event.touches[0];
+            if (!touch) {
+                return;
+            }
+            updateFromPointer(touch.clientX, touch.clientY);
+        });
+
+        heroCharacterStage.addEventListener("mouseleave", resetCharacter);
+        heroCharacterStage.addEventListener("touchend", resetCharacter);
+        resetCharacter();
     }
 
     const counters = document.querySelectorAll("[data-counter]");
@@ -224,11 +335,11 @@
                 lastScrollY = currentScrollY;
 
                 if (delta < 0) {
-                    // Scroll up: move tools strip to left
-                    offset += Math.abs(delta) * scrollSpeedFactor;
+                    // Scroll up: move tools strip to right (reverse direction)
+                    offset += delta * scrollSpeedFactor;
                 } else if (delta > 0) {
-                    // Scroll down: move to right
-                    offset -= delta * scrollSpeedFactor;
+                    // Scroll down: also keep moving tools strip to left
+                    offset += delta * scrollSpeedFactor;
                 }
 
                 applyToolsTransform();

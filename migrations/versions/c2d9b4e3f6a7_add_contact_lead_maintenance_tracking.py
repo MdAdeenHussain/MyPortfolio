@@ -17,14 +17,28 @@ depends_on = None
 
 
 def upgrade():
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    lead_columns = {col["name"] for col in inspector.get_columns("contact_leads")}
+
     with op.batch_alter_table("contact_leads", schema=None) as batch_op:
-        batch_op.add_column(sa.Column("maintenance_subscribed", sa.Boolean(), nullable=True))
-        batch_op.add_column(sa.Column("maintenance_until", sa.Date(), nullable=True))
-        batch_op.add_column(sa.Column("completed_at", sa.DateTime(), nullable=True))
+        if "maintenance_subscribed" not in lead_columns:
+            batch_op.add_column(sa.Column("maintenance_subscribed", sa.Boolean(), nullable=True))
+        if "maintenance_until" not in lead_columns:
+            batch_op.add_column(sa.Column("maintenance_until", sa.Date(), nullable=True))
+        if "completed_at" not in lead_columns:
+            batch_op.add_column(sa.Column("completed_at", sa.DateTime(), nullable=True))
 
 
 def downgrade():
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    lead_columns = {col["name"] for col in inspector.get_columns("contact_leads")}
+
     with op.batch_alter_table("contact_leads", schema=None) as batch_op:
-        batch_op.drop_column("completed_at")
-        batch_op.drop_column("maintenance_until")
-        batch_op.drop_column("maintenance_subscribed")
+        if "completed_at" in lead_columns:
+            batch_op.drop_column("completed_at")
+        if "maintenance_until" in lead_columns:
+            batch_op.drop_column("maintenance_until")
+        if "maintenance_subscribed" in lead_columns:
+            batch_op.drop_column("maintenance_subscribed")
