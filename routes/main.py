@@ -4,7 +4,7 @@ from flask import Blueprint, Response, current_app, render_template, request, ur
 
 from extensions import db
 from models import BlogPosts, PlanCatalog, PortfolioProjects, Testimonials
-from routes.shared import DEFAULT_PLAN_DATA, PLAN_DROPDOWN_OPTIONS
+from routes.shared import DEFAULT_PLAN_DATA, MAINTENANCE_PLAN_DATA, PLAN_DROPDOWN_OPTIONS
 
 main_bp = Blueprint("main", __name__)
 
@@ -25,6 +25,14 @@ def home():
     plans_by_category = defaultdict(list)
     for plan in plan_rows:
         plan.features_list = [line.strip() for line in plan.features.split("\n") if line.strip()]
+        maintenance_info = MAINTENANCE_PLAN_DATA.get(plan.category, {}).get(plan.name)
+        plan.one_time_display = plan.price_one_time or "Not offered as one-time"
+        plan.maintenance_price = (maintenance_info or {}).get("price_monthly") or plan.price_monthly or "Custom Quote"
+        plan.maintenance_best_for = (maintenance_info or {}).get("best_for") or plan.best_for
+        plan.maintenance_description = (maintenance_info or {}).get(
+            "description"
+        ) or "Monthly maintenance to keep your system secure, optimized, and running smoothly."
+        plan.maintenance_features = (maintenance_info or {}).get("features") or plan.features_list
         plans_by_category[plan.category].append(plan)
 
     featured_projects = PortfolioProjects.query.order_by(PortfolioProjects.featured.desc(), PortfolioProjects.created_at.desc()).limit(6).all()

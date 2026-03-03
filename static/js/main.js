@@ -76,33 +76,26 @@
         counters.forEach((counter) => counterObserver.observe(counter));
     }
 
-    const pricingButtons = document.querySelectorAll(".pricing-toggle-btn");
-    const planCards = document.querySelectorAll(".plan-card");
+    const planScopes = document.querySelectorAll("[data-plans-scope]");
+    planScopes.forEach((scope) => {
+        const buttons = scope.querySelectorAll(".pricing-toggle-btn");
+        const cards = scope.querySelectorAll("[data-plan-flip]");
 
-    const updatePriceMode = (mode) => {
-        planCards.forEach((card) => {
-            const oneTimePrice = card.dataset.oneTime;
-            const monthlyPrice = card.dataset.monthly;
-            const target = mode === "monthly" ? monthlyPrice : oneTimePrice;
-            const fallback = mode === "monthly" ? oneTimePrice : monthlyPrice;
-            const priceNode = card.querySelector("[data-price-text]");
-            if (priceNode) {
-                priceNode.textContent = target || fallback || "Custom Quote";
-            }
+        const updateScopeMode = (mode) => {
+            buttons.forEach((btn) => {
+                btn.classList.toggle("active", btn.dataset.priceMode === mode);
+            });
+            cards.forEach((card) => {
+                card.classList.toggle("is-monthly", mode === "monthly");
+            });
+        };
+
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => updateScopeMode(btn.dataset.priceMode));
         });
 
-        pricingButtons.forEach((btn) => {
-            btn.classList.toggle("active", btn.dataset.priceMode === mode);
-        });
-    };
-
-    pricingButtons.forEach((btn) => {
-        btn.addEventListener("click", () => updatePriceMode(btn.dataset.priceMode));
+        updateScopeMode("one_time");
     });
-
-    if (pricingButtons.length > 0) {
-        updatePriceMode("one_time");
-    }
 
     const ajaxForms = document.querySelectorAll(".ajax-form");
     ajaxForms.forEach((form) => {
@@ -182,6 +175,76 @@
             img.addEventListener("load", () => img.closest(".skeleton")?.classList.remove("skeleton"));
         }
     });
+
+    const toolsTrack = document.getElementById("toolsTrack");
+    if (toolsTrack) {
+        let offset = 0;
+        let lastScrollY = window.scrollY;
+        let cycleWidth = 0;
+        let scrollSpeedFactor = 1.4;
+        let rafId = 0;
+        let lastFrameTs = 0;
+        const autoSpeedPxPerSecond = 34;
+
+        const updateToolsMetrics = () => {
+            const firstRow = toolsTrack.querySelector(".tools-row");
+            cycleWidth = firstRow ? firstRow.scrollWidth : 0;
+            const scrollableHeight = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+            if (cycleWidth > 0) {
+                scrollSpeedFactor = Math.max(1.1, (cycleWidth / scrollableHeight) * 2.8);
+            }
+        };
+
+        const applyToolsTransform = () => {
+            if (cycleWidth <= 0) {
+                return;
+            }
+            offset = ((offset % cycleWidth) + cycleWidth) % cycleWidth;
+            toolsTrack.style.transform = `translateX(${-offset}px)`;
+        };
+
+        const animateToolsTrack = (timestamp) => {
+            if (!lastFrameTs) {
+                lastFrameTs = timestamp;
+            }
+            const dt = timestamp - lastFrameTs;
+            lastFrameTs = timestamp;
+
+            // Keep strip moving continuously even when page is idle.
+            offset += (autoSpeedPxPerSecond * dt) / 1000;
+            applyToolsTransform();
+            rafId = window.requestAnimationFrame(animateToolsTrack);
+        };
+
+        window.addEventListener(
+            "scroll",
+            () => {
+                const currentScrollY = window.scrollY;
+                const delta = currentScrollY - lastScrollY;
+                lastScrollY = currentScrollY;
+
+                if (delta < 0) {
+                    // Scroll up: move tools strip to left
+                    offset += Math.abs(delta) * scrollSpeedFactor;
+                } else if (delta > 0) {
+                    // Scroll down: move to right
+                    offset -= delta * scrollSpeedFactor;
+                }
+
+                applyToolsTransform();
+            },
+            { passive: true }
+        );
+
+        window.addEventListener("resize", () => {
+            updateToolsMetrics();
+            applyToolsTransform();
+        });
+
+        updateToolsMetrics();
+        applyToolsTransform();
+        rafId = window.requestAnimationFrame(animateToolsTrack);
+    }
 
     const faqChatToggle = document.getElementById("faqChatToggle");
     const faqChatPanel = document.getElementById("faqChatPanel");
