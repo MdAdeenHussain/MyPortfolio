@@ -1,0 +1,42 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Manage Testimonials{% endblock %}
+{% block content %}
+<section class="pt-4 grid xl:grid-cols-[1fr_1fr] gap-6">
+    <article class="glass-card p-5">
+        <h1 class="section-title text-2xl">{{ 'Edit Testimonial' if testimonial_to_edit else 'Add Testimonial' }}</h1>
+        <form method="post" class="space-y-3 mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if testimonial_to_edit %}<input type="hidden" name="id" value="{{ testimonial_to_edit.id }}">{% endif %}
+            <input required name="client_name" value="{{ testimonial_to_edit.client_name if testimonial_to_edit else '' }}" type="text" class="input-field" placeholder="Client Name">
+            <input name="company" value="{{ testimonial_to_edit.company if testimonial_to_edit else '' }}" type="text" class="input-field" placeholder="Company">
+            <textarea required name="testimonial" rows="5" class="input-field" placeholder="Testimonial text">{{ testimonial_to_edit.testimonial if testimonial_to_edit else '' }}</textarea>
+            <input name="rating" min="1" max="5" value="{{ testimonial_to_edit.rating if testimonial_to_edit else 5 }}" type="number" class="input-field" placeholder="Rating (1-5)">
+            <label class="inline-flex items-center gap-2 text-sm">
+                <input type="checkbox" name="is_featured" {% if testimonial_to_edit and testimonial_to_edit.is_featured %}checked{% endif %}> Featured
+            </label>
+            <button class="capsule-btn capsule-primary" type="submit">{{ 'Update' if testimonial_to_edit else 'Add' }} Testimonial</button>
+        </form>
+    </article>
+
+    <article class="glass-card p-5">
+        <h2 class="text-xl font-bold">Testimonials</h2>
+        <div class="space-y-3 mt-4 max-h-[520px] overflow-auto">
+            {% for row in testimonials %}
+            <div class="p-4 rounded-xl border border-white/10">
+                <h3 class="font-semibold">{{ row.client_name }}{% if row.company %} · {{ row.company }}{% endif %}</h3>
+                <p class="text-sm text-muted mt-1">{{ row.testimonial }}</p>
+                <div class="mt-3 flex gap-3">
+                    <a href="{{ url_for('admin.testimonials', edit=row.id) }}" class="text-cyan-300 hover:text-cyan-200">Edit</a>
+                    <form method="post" action="{{ url_for('admin.delete_testimonial', testimonial_id=row.id) }}" onsubmit="return confirm('Delete this testimonial?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="text-red-300 hover:text-red-200">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-muted">No testimonials yet.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

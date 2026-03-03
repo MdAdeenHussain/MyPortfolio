@@ -1,0 +1,44 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Plan Inquiries{% endblock %}
+{% block content %}
+<section class="pt-4">
+    <h1 class="section-title">Plan Inquiries</h1>
+    <p class="text-muted">High-intent inquiry submissions from the pricing funnel.</p>
+
+    <div class="glass-card p-4 overflow-x-auto mt-4">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Service</th>
+                    <th>Plan</th>
+                    <th>Timeline</th>
+                    <th>Budget</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in inquiries %}
+                <tr>
+                    <td>{{ row.full_name }}</td>
+                    <td>{{ row.email }}</td>
+                    <td>{{ row.service_type }}</td>
+                    <td>{{ row.plan_name }}</td>
+                    <td>{{ row.timeline or '-' }}</td>
+                    <td>{{ row.budget or '-' }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.delete_inquiry', inquiry_id=row.id) }}" onsubmit="return confirm('Delete this inquiry?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="text-red-300 hover:text-red-200" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No inquiries found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

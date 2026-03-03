@@ -1,0 +1,60 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Manage Leads{% endblock %}
+{% block content %}
+<section class="pt-4 space-y-4">
+    <div class="flex flex-wrap gap-3 items-end justify-between">
+        <div>
+            <h1 class="section-title">Contact Leads</h1>
+            <p class="text-muted">Search, filter, and export all incoming leads.</p>
+        </div>
+        <a href="{{ url_for('admin.export_leads_csv') }}" class="capsule-btn capsule-secondary">Download CSV</a>
+    </div>
+
+    <form method="get" class="glass-card p-4 grid md:grid-cols-3 gap-3">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name/email/company/plan" class="input-field">
+        <select name="status" class="input-field">
+            <option value="">All Status</option>
+            {% for s in ['new', 'contacted', 'qualified', 'closed'] %}
+            <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+        <button class="capsule-btn capsule-primary" type="submit">Apply Filter</button>
+    </form>
+
+    <div class="glass-card p-4 overflow-x-auto">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Plan</th>
+                    <th>Budget</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>{{ lead.full_name }}</td>
+                    <td>{{ lead.email }}</td>
+                    <td>{{ lead.selected_plan or '-' }}</td>
+                    <td>{{ lead.budget or '-' }}</td>
+                    <td>{{ lead.status }}</td>
+                    <td>{{ lead.created_at.strftime('%d %b %Y') }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.delete_lead', lead_id=lead.id) }}" onsubmit="return confirm('Delete this lead?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="text-red-300 hover:text-red-200" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No leads found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

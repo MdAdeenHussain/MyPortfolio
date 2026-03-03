@@ -1,0 +1,16 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Admin Login{% endblock %}
+{% block content %}
+<section class="min-h-[70vh] grid place-items-center">
+    <div class="glass-card w-full max-w-md p-8">
+        <h1 class="section-title text-center">Admin Login</h1>
+        <p class="text-center text-muted mt-2">Secure access for portfolio operations.</p>
+        <form method="post" class="mt-6 space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="email" name="email" required class="input-field" placeholder="Admin Email">
+            <input type="password" name="password" required class="input-field" placeholder="Password">
+            <button type="submit" class="capsule-btn capsule-primary w-full">Login</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

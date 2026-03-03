@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Blog | Md Adeen Hussain{% endblock %}
+{% block content %}
+<section class="section-gap pt-16">
+    <div class="container mx-auto px-4 max-w-5xl">
+        <h1 class="section-title">Blog</h1>
+        <p class="section-sub">Technical notes, execution frameworks, and growth engineering insights.</p>
+        <div class="grid md:grid-cols-2 gap-6 mt-8">
+            {% for post in posts %}
+            <article class="glass-card reveal">
+                <p class="text-xs text-muted">{{ post.created_at.strftime('%d %b %Y') }}</p>
+                <h2 class="text-2xl font-bold mt-2">{{ post.title }}</h2>
+                <p class="text-sm text-muted mt-3">{{ post.excerpt }}</p>
+                <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="capsule-btn capsule-secondary mt-5">Read Article</a>
+            </article>
+            {% else %}
+            <p class="text-muted">No posts available yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

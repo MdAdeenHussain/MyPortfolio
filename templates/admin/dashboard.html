@@ -1,0 +1,108 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<section class="pt-4 space-y-6">
+    <div>
+        <h1 class="section-title">Analytics Dashboard</h1>
+        <p class="text-muted">Leads, revenue, engagement, and service intelligence in one panel.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <article class="glass-card p-5">
+            <p class="text-xs text-muted uppercase">Total Leads</p>
+            <p class="text-3xl font-extrabold mt-2">{{ metrics.total_leads }}</p>
+        </article>
+        <article class="glass-card p-5">
+            <p class="text-xs text-muted uppercase">Active Projects</p>
+            <p class="text-3xl font-extrabold mt-2">{{ metrics.active_projects }}</p>
+        </article>
+        <article class="glass-card p-5">
+            <p class="text-xs text-muted uppercase">Monthly Revenue</p>
+            <p class="text-3xl font-extrabold mt-2">₹{{ '%.0f'|format(metrics.monthly_revenue) }}</p>
+        </article>
+        <article class="glass-card p-5">
+            <p class="text-xs text-muted uppercase">Pending Inquiries</p>
+            <p class="text-3xl font-extrabold mt-2">{{ metrics.pending_inquiries }}</p>
+        </article>
+        <article class="glass-card p-5">
+            <p class="text-xs text-muted uppercase">Automation Health</p>
+            <p class="text-xl font-bold mt-2 {% if metrics.health_status == 'Healthy' %}text-emerald-400{% else %}text-amber-300{% endif %}">{{ metrics.health_status }}</p>
+        </article>
+    </div>
+
+    <div class="grid xl:grid-cols-2 gap-6">
+        <article class="glass-card p-5">
+            <h2 class="text-lg font-bold">Monthly Leads Graph</h2>
+            <canvas id="monthlyLeadsChart" height="140"></canvas>
+        </article>
+        <article class="glass-card p-5">
+            <h2 class="text-lg font-bold">Revenue Graph</h2>
+            <canvas id="revenueChart" height="140"></canvas>
+        </article>
+        <article class="glass-card p-5">
+            <h2 class="text-lg font-bold">Plan Distribution</h2>
+            <canvas id="planPieChart" height="160"></canvas>
+        </article>
+        <article class="glass-card p-5">
+            <h2 class="text-lg font-bold">Service Type Analytics</h2>
+            <canvas id="serviceChart" height="160"></canvas>
+        </article>
+    </div>
+
+    <div class="grid xl:grid-cols-[1.1fr_1fr] gap-6">
+        <article class="glass-card p-5">
+            <h2 class="text-lg font-bold">Traffic Overview (Dummy)</h2>
+            <canvas id="trafficChart" height="120"></canvas>
+        </article>
+        <article class="glass-card p-5">
+            <h2 class="text-lg font-bold">Notification Alerts</h2>
+            <div class="space-y-3 mt-4 max-h-64 overflow-auto">
+                {% for alert in alerts %}
+                <div class="p-3 rounded-xl border border-white/10">
+                    <p class="font-semibold">{{ alert.title }}</p>
+                    <p class="text-sm text-muted">{{ alert.body }}</p>
+                    <p class="text-xs text-muted mt-1">{{ alert.created_at.strftime('%d %b %H:%M') }}</p>
+                </div>
+                {% else %}
+                <p class="text-sm text-muted">No alerts.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </div>
+
+    <article class="glass-card p-5">
+        <h2 class="text-lg font-bold">Activity Logs</h2>
+        <div class="overflow-x-auto mt-4">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Actor</th>
+                        <th>Action</th>
+                        <th>Entity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in activities %}
+                    <tr>
+                        <td>{{ row.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                        <td>{{ row.actor_email }}</td>
+                        <td>{{ row.action }}</td>
+                        <td>{{ row.entity }} #{{ row.entity_id }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">No activity yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+window.dashboardData = {{ chart_data|tojson }};
+</script>
+{% endblock %}

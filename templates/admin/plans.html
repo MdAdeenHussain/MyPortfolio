@@ -1,0 +1,44 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Manage Plans{% endblock %}
+{% block content %}
+<section class="pt-4 grid xl:grid-cols-[1fr_1fr] gap-6">
+    <article class="glass-card p-5">
+        <h1 class="section-title text-2xl">{{ 'Edit Plan' if plan_to_edit else 'Add Plan' }}</h1>
+        <form method="post" class="space-y-3 mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if plan_to_edit %}<input type="hidden" name="id" value="{{ plan_to_edit.id }}">{% endif %}
+            <input required name="category" value="{{ plan_to_edit.category if plan_to_edit else '' }}" type="text" class="input-field" placeholder="Category">
+            <input required name="name" value="{{ plan_to_edit.name if plan_to_edit else '' }}" type="text" class="input-field" placeholder="Plan Name">
+            <input name="price_one_time" value="{{ plan_to_edit.price_one_time if plan_to_edit else '' }}" type="text" class="input-field" placeholder="One-time Price">
+            <input name="price_monthly" value="{{ plan_to_edit.price_monthly if plan_to_edit else '' }}" type="text" class="input-field" placeholder="Monthly Price">
+            <input required name="best_for" value="{{ plan_to_edit.best_for if plan_to_edit else '' }}" type="text" class="input-field" placeholder="Best For">
+            <textarea required name="features" rows="6" class="input-field" placeholder="One feature per line">{{ plan_to_edit.features if plan_to_edit else '' }}</textarea>
+            <label class="inline-flex items-center gap-2 text-sm">
+                <input type="checkbox" name="is_recommended" {% if plan_to_edit and plan_to_edit.is_recommended %}checked{% endif %}> Recommended
+            </label>
+            <button class="capsule-btn capsule-primary" type="submit">{{ 'Update' if plan_to_edit else 'Add' }} Plan</button>
+        </form>
+    </article>
+
+    <article class="glass-card p-5">
+        <h2 class="text-xl font-bold">Plan Catalog</h2>
+        <div class="space-y-3 mt-4 max-h-[520px] overflow-auto">
+            {% for plan in plans %}
+            <div class="p-4 rounded-xl border border-white/10">
+                <h3 class="font-semibold">{{ plan.category }} · {{ plan.name }}</h3>
+                <p class="text-xs text-muted">{{ plan.price_one_time or '—' }} | {{ plan.price_monthly or '—' }}</p>
+                <div class="mt-3 flex gap-3">
+                    <a href="{{ url_for('admin.plans', edit=plan.id) }}" class="text-cyan-300 hover:text-cyan-200">Edit</a>
+                    <form method="post" action="{{ url_for('admin.delete_plan', plan_id=plan.id) }}" onsubmit="return confirm('Delete this plan?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="text-red-300 hover:text-red-200">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-muted">No plans yet.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

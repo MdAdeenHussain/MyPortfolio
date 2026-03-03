@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} | Md Adeen Hussain{% endblock %}
+{% block content %}
+<article class="section-gap pt-16">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <a href="{{ url_for('main.blog_list') }}" class="text-cyan-300 hover:text-cyan-200">← Back to Blog</a>
+        <h1 class="section-title mt-4">{{ post.title }}</h1>
+        <p class="text-sm text-muted mt-2">{{ post.created_at.strftime('%d %b %Y') }} · {{ post.tags }}</p>
+        <div class="glass-card mt-8">
+            <p class="leading-8 text-app">{{ post.content }}</p>
+        </div>
+    </div>
+</article>
+{% endblock %}

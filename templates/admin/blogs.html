@@ -1,0 +1,42 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Manage Blog Posts{% endblock %}
+{% block content %}
+<section class="pt-4 grid xl:grid-cols-[1.05fr_1fr] gap-6">
+    <article class="glass-card p-5">
+        <h1 class="section-title text-2xl">{{ 'Edit Blog Post' if blog_to_edit else 'Create Blog Post' }}</h1>
+        <form method="post" class="space-y-3 mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if blog_to_edit %}<input type="hidden" name="id" value="{{ blog_to_edit.id }}">{% endif %}
+            <input required name="title" value="{{ blog_to_edit.title if blog_to_edit else '' }}" type="text" class="input-field" placeholder="Title">
+            <input required name="excerpt" value="{{ blog_to_edit.excerpt if blog_to_edit else '' }}" type="text" class="input-field" placeholder="Excerpt">
+            <textarea required name="content" rows="8" class="input-field" placeholder="Content">{{ blog_to_edit.content if blog_to_edit else '' }}</textarea>
+            <input name="tags" value="{{ blog_to_edit.tags if blog_to_edit else '' }}" type="text" class="input-field" placeholder="Tags (comma separated)">
+            <label class="inline-flex items-center gap-2 text-sm">
+                <input type="checkbox" name="is_published" {% if not blog_to_edit or blog_to_edit.is_published %}checked{% endif %}> Published
+            </label>
+            <button class="capsule-btn capsule-primary" type="submit">{{ 'Update' if blog_to_edit else 'Create' }} Post</button>
+        </form>
+    </article>
+
+    <article class="glass-card p-5">
+        <h2 class="text-xl font-bold">Existing Posts</h2>
+        <div class="space-y-3 mt-4 max-h-[520px] overflow-auto">
+            {% for post in posts %}
+            <div class="p-4 rounded-xl border border-white/10">
+                <h3 class="font-semibold">{{ post.title }}</h3>
+                <p class="text-xs text-muted">/{{ post.slug }} · {{ 'Published' if post.is_published else 'Draft' }}</p>
+                <div class="mt-3 flex gap-3">
+                    <a href="{{ url_for('admin.blogs', edit=post.id) }}" class="text-cyan-300 hover:text-cyan-200">Edit</a>
+                    <form method="post" action="{{ url_for('admin.delete_blog', post_id=post.id) }}" onsubmit="return confirm('Delete this post?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="text-red-300 hover:text-red-200">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-muted">No blog posts yet.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

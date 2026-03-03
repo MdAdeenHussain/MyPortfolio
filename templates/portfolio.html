@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Portfolio | Md Adeen Hussain{% endblock %}
+{% block content %}
+<section class="section-gap pt-16">
+    <div class="container mx-auto px-4">
+        <h1 class="section-title">Portfolio Projects</h1>
+        <p class="section-sub">Production-grade solutions for growth and automation.</p>
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
+            {% for project in projects %}
+            <article id="{{ project.slug }}" class="portfolio-card reveal">
+                <img loading="lazy" src="{{ project.cover_image or 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ project.title }}" class="portfolio-image">
+                <div class="p-5">
+                    <h2 class="text-xl font-bold">{{ project.title }}</h2>
+                    <p class="text-sm text-muted mt-2">{{ project.description }}</p>
+                    <p class="text-xs text-cyan-300 mt-3">{{ project.tech_stack }}</p>
+                    <div class="flex gap-3 mt-4">
+                        {% if project.project_url %}<a href="{{ project.project_url }}" class="capsule-btn capsule-secondary">Live</a>{% endif %}
+                        {% if project.github_url %}<a href="{{ project.github_url }}" class="capsule-btn capsule-secondary">Code</a>{% endif %}
+                    </div>
+                </div>
+            </article>
+            {% else %}
+            <p class="text-muted">Projects will be added soon.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
