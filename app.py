@@ -1,9 +1,12 @@
 import os
+import re
 from datetime import datetime
+from urllib.parse import quote
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
-from flask import Flask, render_template
+from sqlalchemy.exc import SQLAlchemyError
+from flask import Flask, render_template, url_for
 
 load_dotenv()
 
@@ -19,8 +22,51 @@ from models import (
     PlanCatalog,
     PlanInquiries,
     PortfolioProjects,
+    SiteSettings,
     Testimonials,
 )
+
+
+DEFAULT_SITE_SETTINGS = {
+    "instagram_url": "",
+    "x_url": "",
+    "linkedin_url": "",
+    "facebook_url": "",
+    "whatsapp_number": "+91 9674667587",
+}
+
+
+def whatsapp_link_from_number(raw_number):
+    digits = re.sub(r"\D", "", raw_number or "")
+    if not digits:
+        digits = "919674667587"
+    message = quote("Hi Adeen, I want to discuss a project.")
+    return f"https://wa.me/{digits}?text={message}"
+
+
+def get_site_settings_payload():
+    payload = dict(DEFAULT_SITE_SETTINGS)
+    try:
+        settings = SiteSettings.query.first()
+        if settings:
+            payload["instagram_url"] = settings.instagram_url or payload["instagram_url"]
+            payload["x_url"] = settings.x_url or payload["x_url"]
+            payload["linkedin_url"] = settings.linkedin_url or payload["linkedin_url"]
+            payload["facebook_url"] = settings.facebook_url or payload["facebook_url"]
+            payload["whatsapp_number"] = settings.whatsapp_number or payload["whatsapp_number"]
+    except SQLAlchemyError:
+        # During first boot or migration race, keep defaults.
+        pass
+
+    payload["whatsapp_chat_link"] = whatsapp_link_from_number(payload["whatsapp_number"])
+    payload["social_links"] = [
+        {"name": "Instagram", "url": payload["instagram_url"], "key": "instagram"},
+        {"name": "X", "url": payload["x_url"], "key": "x"},
+        {"name": "LinkedIn", "url": payload["linkedin_url"], "key": "linkedin"},
+        {"name": "Facebook", "url": payload["facebook_url"], "key": "facebook"},
+    ]
+    return payload
+
 
 def maybe_fallback_to_sqlite(app, env_name):
     """Fallback to SQLite in development when PostgreSQL config is placeholder/unreachable."""
@@ -68,11 +114,6 @@ def create_app(config_name=None):
     login_manager.login_view = "admin.login"
     login_manager.login_message_category = "warning"
 
-    if env_name != "production" and app.config["SQLALCHEMY_DATABASE_URI"].startswith("sqlite"):
-        # Local convenience: prevents "no such table" errors before first migration run.
-        with app.app_context():
-            db.create_all()
-
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     from routes.admin import admin_bp
@@ -85,9 +126,19 @@ def create_app(config_name=None):
 
     @app.context_processor
     def inject_globals():
+        site_settings = get_site_settings_payload()
         return {
             "current_year": datetime.utcnow().year,
             "seo_keywords": app.config.get("SEO_KEYWORDS"),
+            "site_settings": site_settings,
+            "social_links": site_settings["social_links"],
+            "whatsapp_chat_link": site_settings["whatsapp_chat_link"],
+            "policy_links": [
+                {"label": "Terms & Conditions", "href": url_for("main.terms_and_conditions")},
+                {"label": "Privacy Policy", "href": url_for("main.privacy_policy")},
+                {"label": "Refund Policy", "href": url_for("main.refund_policy")},
+                {"label": "Cookies Policy", "href": url_for("main.cookies_policy")},
+            ],
         }
 
     @app.after_request
@@ -268,6 +319,9 @@ def seed_demo_data():
                 project_details="Looking for GPT support + FAQ and CRM sync.",
             )
         )
+
+    if not SiteSettings.query.first():
+        db.session.add(SiteSettings(**DEFAULT_SITE_SETTINGS))
 
     db.session.add(
         ActivityLog(

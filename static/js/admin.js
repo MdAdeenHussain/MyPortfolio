@@ -15,7 +15,7 @@
             legend: {
                 labels: {
                     color: defaultTextColor,
-                    font: { family: "Manrope" },
+                    font: { family: "Nunito" },
                 },
             },
         },

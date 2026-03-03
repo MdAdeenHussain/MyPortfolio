@@ -173,6 +173,17 @@ class NotificationAlert(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
 
+class SiteSettings(db.Model, TimestampMixin):
+    __tablename__ = "site_settings"
+
+    id = db.Column(db.Integer, primary_key=True)
+    instagram_url = db.Column(db.String(255), default="")
+    x_url = db.Column(db.String(255), default="")
+    linkedin_url = db.Column(db.String(255), default="")
+    facebook_url = db.Column(db.String(255), default="")
+    whatsapp_number = db.Column(db.String(30), default="+91 9674667587")
+
+
 # Optional E-Commerce module
 class Product(db.Model, TimestampMixin):
     __tablename__ = "products"

@@ -45,7 +45,7 @@ body {
         radial-gradient(700px 450px at 10% 0%, var(--grad-a) 0%, transparent 62%),
         var(--bg);
     color: var(--text);
-    font-family: "Manrope", sans-serif;
+    font-family: "Nunito", sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -55,7 +55,7 @@ h2,
 h3,
 h4,
 .logo-link {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: "Nunito", sans-serif;
 }
 
 .bg-app {
@@ -624,6 +624,248 @@ h4,
     letter-spacing: 0.07em;
 }
 
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.2rem;
+}
+
+.footer-title {
+    font-weight: 700;
+}
+
+.footer-links {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.footer-link {
+    color: var(--muted);
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: #22d3ee;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.social-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-soft) 70%, transparent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.social-icon svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: #22d3ee;
+}
+
+.social-icon:hover {
+    transform: translateY(-2px);
+    border-color: rgba(34, 211, 238, 0.6);
+}
+
+.social-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.faq-chatbot-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 5rem;
+    width: 3.3rem;
+    height: 3.3rem;
+    border-radius: 999px;
+    border: 1px solid rgba(34, 211, 238, 0.55);
+    background: linear-gradient(120deg, #0ea5b7, #312e81);
+    box-shadow: 0 12px 30px rgba(14, 165, 183, 0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 81;
+}
+
+.faq-chatbot-float svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: #fff;
+}
+
+.faq-chatbot-panel {
+    position: fixed;
+    right: 1rem;
+    bottom: 9rem;
+    width: min(360px, calc(100vw - 2rem));
+    background: color-mix(in srgb, var(--bg-soft) 82%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+    z-index: 85;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px) scale(0.98);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.faq-chatbot-panel.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.faq-chatbot-header {
+    padding: 0.8rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.faq-chatbot-title {
+    font-weight: 700;
+    font-size: 0.92rem;
+}
+
+.faq-chatbot-subtitle {
+    font-size: 0.74rem;
+    color: var(--muted);
+}
+
+.faq-close-btn {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.faq-chatbot-messages {
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 0.8rem;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.faq-msg {
+    padding: 0.55rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+.faq-msg-bot {
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.faq-msg-user {
+    background: rgba(34, 211, 238, 0.16);
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    color: var(--text);
+    justify-self: end;
+}
+
+.faq-quick-questions {
+    padding: 0 0.8rem 0.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.faq-chip {
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-soft) 75%, transparent);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 0.28rem 0.58rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.faq-chip:hover {
+    color: var(--text);
+    border-color: rgba(34, 211, 238, 0.4);
+}
+
+.faq-chatbot-form {
+    border-top: 1px solid var(--border);
+    padding: 0.7rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.faq-chatbot-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 0.65rem;
+    background: color-mix(in srgb, var(--bg-soft) 76%, transparent);
+    color: var(--text);
+    font-size: 0.82rem;
+}
+
+.faq-chatbot-send {
+    border: 0;
+    border-radius: 10px;
+    padding: 0.5rem 0.72rem;
+    background: #22d3ee;
+    color: #04242d;
+    font-weight: 700;
+    font-size: 0.76rem;
+    cursor: pointer;
+}
+
+.whatsapp-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    width: 3.3rem;
+    height: 3.3rem;
+    border-radius: 999px;
+    background: #22c55e;
+    box-shadow: 0 12px 28px rgba(34, 197, 94, 0.38);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 80;
+    animation: pulseWhatsapp 2.1s ease-in-out infinite;
+}
+
+.whatsapp-float svg {
+    width: 1.55rem;
+    height: 1.55rem;
+    fill: #fff;
+}
+
+@keyframes pulseWhatsapp {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.07);
+    }
+}
+
 @media (max-width: 768px) {
     .section-gap {
         margin-top: 4rem;
@@ -638,5 +880,24 @@ h4,
         position: static;
         display: inline-block;
         margin-bottom: 0.4rem;
+    }
+    .faq-chatbot-panel {
+        right: 0.7rem;
+        bottom: 8.4rem;
+        width: min(360px, calc(100vw - 1.4rem));
+    }
+    .faq-chatbot-float {
+        right: 0.7rem;
+        bottom: 4.8rem;
+    }
+    .whatsapp-float {
+        right: 0.7rem;
+        bottom: 1rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 1.3fr repeat(3, 1fr);
     }
 }

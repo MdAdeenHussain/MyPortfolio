@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function () {
+            try {
+                var storedTheme = localStorage.getItem("site-theme");
+                var theme = storedTheme === "light" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", theme);
+            } catch (e) {
+                document.documentElement.setAttribute("data-theme", "dark");
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>{% block title %}Admin Dashboard{% endblock %}</title>
@@ -35,6 +46,7 @@
             <a href="{{ url_for('admin.projects') }}" class="admin-nav-link">Projects</a>
             <a href="{{ url_for('admin.testimonials') }}" class="admin-nav-link">Testimonials</a>
             <a href="{{ url_for('admin.plans') }}" class="admin-nav-link">Plans</a>
+            <a href="{{ url_for('admin.settings') }}" class="admin-nav-link">Settings</a>
             <a href="{{ url_for('main.home') }}" class="admin-nav-link">View Site</a>
         </div>
     </nav>

@@ -1,0 +1,68 @@
+<footer class="border-t border-white/10 mt-24">
+    <div class="container mx-auto px-4 py-10 footer-grid text-sm">
+        <div>
+            <p class="font-semibold">Md Adeen Hussain</p>
+            <p class="text-muted mt-2">Premium web development, automation, and AI systems for global clients.</p>
+            <p class="text-muted mt-3">© {{ current_year }} All rights reserved.</p>
+        </div>
+        <div>
+            <p class="footer-title">Policies</p>
+            <div class="footer-links mt-3">
+                {% for link in policy_links %}
+                <a href="{{ link.href }}" class="footer-link">{{ link.label }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <p class="footer-title">Quick Links</p>
+            <div class="footer-links mt-3">
+                <a href="mailto:hello@adeen.dev" class="footer-link">hello@adeen.dev</a>
+            </div>
+        </div>
+        <div>
+            <p class="footer-title">Socials</p>
+            <div class="social-links mt-3">
+                {% for link in social_links %}
+                <a href="{{ link.url or '#' }}"
+                   class="social-icon {% if not link.url %}social-disabled{% endif %}"
+                   {% if link.url %}target="_blank" rel="noopener noreferrer"{% endif %}
+                   aria-label="{{ link.name }}">
+                    {% if link.key == 'instagram' %}
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm0 1.9A3.9 3.9 0 0 0 3.9 7.8v8.4a3.9 3.9 0 0 0 3.9 3.9h8.4a3.9 3.9 0 0 0 3.9-3.9V7.8a3.9 3.9 0 0 0-3.9-3.9Zm8.9 1.5a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.9a3.1 3.1 0 1 0 0 6.2 3.1 3.1 0 0 0 0-6.2Z"/></svg>
+                    {% elif link.key == 'x' %}
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 3H22l-6.8 7.8L23 21h-6.1l-4.8-6.2L6.6 21H3.5l7.2-8.2L3 3h6.2l4.3 5.7L18.9 3Zm-1.1 16h1.7L8.2 4.9H6.4Z"/></svg>
+                    {% elif link.key == 'linkedin' %}
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 3a2.3 2.3 0 1 1 0 4.6 2.3 2.3 0 0 1 0-4.6ZM3.3 9h4V21h-4V9Zm6.3 0h3.8v1.7h.1c.5-1 1.8-2.1 3.7-2.1 4 0 4.8 2.6 4.8 6V21h-4v-5.3c0-1.3 0-2.9-1.8-2.9s-2 1.4-2 2.8V21h-4V9Z"/></svg>
+                    {% elif link.key == 'facebook' %}
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8.5V6.8c0-.8.5-1.3 1.5-1.3H18V2.1h-3.1c-3.4 0-4.9 2-4.9 4.7v1.8H7V12h3v9h4v-9h3.3l.5-3.5H14Z"/></svg>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</footer>
+
+<button id="faqChatToggle" class="faq-chatbot-float" type="button" aria-label="Open FAQ chatbot">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.5 2 2 5.9 2 10.8c0 2.8 1.5 5.3 4 6.9V22l4-2.1c.7.1 1.3.2 2 .2 5.5 0 10-3.9 10-8.8S17.5 2 12 2Zm0 16.1c-.6 0-1.2-.1-1.8-.2l-.6-.1-2.4 1.2v-2.5l-.4-.3C4.8 15 4 13 4 10.8 4 7 7.6 4 12 4s8 3 8 6.8c0 3.7-3.6 7.3-8 7.3Zm-3.4-8h6.8v1.8H8.6v-1.8Zm0-3h6.8v1.8H8.6V7.1Zm0 6h4.2v1.8H8.6v-1.8Z"/></svg>
+</button>
+
+<section id="faqChatPanel" class="faq-chatbot-panel" aria-live="polite" aria-label="FAQ chatbot">
+    <header class="faq-chatbot-header">
+        <div>
+            <p class="faq-chatbot-title">FAQ Assistant</p>
+            <p class="faq-chatbot-subtitle">Quick answers about services and process</p>
+        </div>
+        <button id="faqChatClose" type="button" class="faq-close-btn" aria-label="Close chatbot">×</button>
+    </header>
+    <div id="faqChatMessages" class="faq-chatbot-messages"></div>
+    <div id="faqQuickQuestions" class="faq-quick-questions"></div>
+    <form id="faqChatForm" class="faq-chatbot-form">
+        <input id="faqChatInput" type="text" class="faq-chatbot-input" placeholder="Ask about pricing, timeline, tech..." maxlength="200">
+        <button type="submit" class="faq-chatbot-send">Ask</button>
+    </form>
+</section>
+
+<a href="{{ whatsapp_chat_link }}" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.1 16.8L2 22l5.4-1.1A11 11 0 1 0 20.5 3.5Zm-8.4 17a9 9 0 0 1-4.6-1.3l-.3-.2-3.2.7.7-3.1-.2-.3a9 9 0 1 1 7.6 4.2Zm4.9-6.8c-.3-.2-1.8-.9-2-.9s-.4-.1-.6.2-.7.9-.9 1.1-.3.2-.6.1a7.4 7.4 0 0 1-3.6-3.2c-.2-.3 0-.5.1-.7.1-.1.3-.3.4-.5.2-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.1 0-.4.1-.6.3-.2.3-.8.8-.8 2s.8 2.5.9 2.6c.1.2 1.6 2.6 4 3.6.5.2 1 .4 1.3.5.6.2 1.1.2 1.5.1.5-.1 1.8-.8 2-1.5.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3Z"/></svg>
+</a>

@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function () {
+            try {
+                var storedTheme = localStorage.getItem("site-theme");
+                var theme = storedTheme === "light" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", theme);
+            } catch (e) {
+                document.documentElement.setAttribute("data-theme", "dark");
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Premium freelance web development, automation, and AI chatbot solutions by Md Adeen Hussain.">
@@ -17,7 +28,7 @@
     <link rel="canonical" href="{{ request.base_url }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -36,24 +47,7 @@
 </head>
 <body class="page-transition bg-app text-app">
     <div class="noise-overlay"></div>
-    <header class="site-header">
-        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-            <a href="{{ url_for('main.home') }}" class="logo-link">Md Adeen Hussain</a>
-            <nav class="hidden lg:flex gap-7 text-sm">
-                <a href="{{ url_for('main.home') }}#home" class="nav-link">Home</a>
-                <a href="{{ url_for('main.home') }}#about" class="nav-link">About</a>
-                <a href="{{ url_for('main.home') }}#services" class="nav-link">Services</a>
-                <a href="{{ url_for('main.home') }}#plans" class="nav-link">Plans</a>
-                <a href="{{ url_for('main.home') }}#portfolio" class="nav-link">Portfolio</a>
-                <a href="{{ url_for('main.blog_list') }}" class="nav-link">Blog</a>
-                <a href="{{ url_for('main.home') }}#contact" class="nav-link">Contact</a>
-                <a href="{{ url_for('admin.login') }}" class="nav-link">Admin Login</a>
-            </nav>
-            <button id="themeToggle" type="button" class="theme-toggle" aria-label="Toggle theme">
-                <span class="toggle-thumb"></span>
-            </button>
-        </div>
-    </header>
+    {% include "components/navbar.html" %}
 
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -69,16 +63,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="border-t border-white/10 mt-24">
-        <div class="container mx-auto px-4 py-10 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between text-sm text-muted">
-            <p>© {{ current_year }} Md Adeen Hussain. Built for premium startup and enterprise clients.</p>
-            <div class="flex gap-4">
-                <a href="{{ url_for('main.sitemap_xml') }}" class="hover:text-cyan-300 transition">Sitemap</a>
-                <a href="{{ url_for('main.robots_txt') }}" class="hover:text-cyan-300 transition">Robots</a>
-                <a href="mailto:hello@adeen.dev" class="hover:text-cyan-300 transition">hello@adeen.dev</a>
-            </div>
-        </div>
-    </footer>
+    {% include "components/footer.html" %}
 
     <div id="toast" class="toast"></div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

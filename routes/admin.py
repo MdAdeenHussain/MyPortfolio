@@ -26,6 +26,7 @@ from models import (
     PlanCatalog,
     PlanInquiries,
     PortfolioProjects,
+    SiteSettings,
     Testimonials,
     slugify,
 )
@@ -55,6 +56,25 @@ def subtract_months(source_date, months_back):
         month += 12
         year -= 1
     return source_date.replace(year=year, month=month, day=1)
+
+
+def normalize_url(raw_url):
+    value = (raw_url or "").strip()
+    if not value:
+        return ""
+    if value.startswith(("http://", "https://")):
+        return value
+    return f"https://{value}"
+
+
+def get_or_create_site_settings():
+    settings = SiteSettings.query.first()
+    if settings:
+        return settings
+    settings = SiteSettings(whatsapp_number="+91 9674667587")
+    db.session.add(settings)
+    db.session.flush()
+    return settings
 
 
 def admin_only_required():
@@ -563,3 +583,27 @@ def delete_plan(plan_id):
     db.session.commit()
     flash("Plan deleted.", "success")
     return redirect(url_for("admin.plans"))
+
+
+@admin_bp.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+    gate = admin_only_required()
+    if gate:
+        return gate
+
+    settings_row = get_or_create_site_settings()
+
+    if request.method == "POST":
+        settings_row.instagram_url = normalize_url(request.form.get("instagram_url", ""))
+        settings_row.x_url = normalize_url(request.form.get("x_url", ""))
+        settings_row.linkedin_url = normalize_url(request.form.get("linkedin_url", ""))
+        settings_row.facebook_url = normalize_url(request.form.get("facebook_url", ""))
+        settings_row.whatsapp_number = request.form.get("whatsapp_number", "").strip() or "+91 9674667587"
+
+        log_action("Updated site settings", "SiteSettings", settings_row.id)
+        db.session.commit()
+        flash("Footer links and WhatsApp settings updated.", "success")
+        return redirect(url_for("admin.settings"))
+
+    return render_template("admin/settings.html", settings_row=settings_row)

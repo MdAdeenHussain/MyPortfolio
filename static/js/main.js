@@ -182,4 +182,141 @@
             img.addEventListener("load", () => img.closest(".skeleton")?.classList.remove("skeleton"));
         }
     });
+
+    const faqChatToggle = document.getElementById("faqChatToggle");
+    const faqChatPanel = document.getElementById("faqChatPanel");
+    const faqChatClose = document.getElementById("faqChatClose");
+    const faqChatMessages = document.getElementById("faqChatMessages");
+    const faqQuickQuestions = document.getElementById("faqQuickQuestions");
+    const faqChatForm = document.getElementById("faqChatForm");
+    const faqChatInput = document.getElementById("faqChatInput");
+
+    const faqData = [
+        {
+            question: "What services do you provide?",
+            answer: "I provide website development, e-commerce, Python automation, AI chatbot systems, SEO, and maintenance.",
+            keywords: ["services", "provide", "offer"],
+        },
+        {
+            question: "What is your tech stack?",
+            answer: "My main stack is Python, Flask, PostgreSQL, JavaScript, TailwindCSS, and API integrations.",
+            keywords: ["tech", "stack", "flask", "python", "postgresql"],
+        },
+        {
+            question: "Do you work with international clients?",
+            answer: "Yes. I work with clients in India and international markets with structured communication and clear milestones.",
+            keywords: ["international", "global", "outside india"],
+        },
+        {
+            question: "How long does a website project take?",
+            answer: "Most business websites take around 2 to 6 weeks depending on scope, content readiness, and revisions.",
+            keywords: ["timeline", "how long", "duration", "weeks"],
+        },
+        {
+            question: "Do you provide maintenance after launch?",
+            answer: "Yes. I offer monthly maintenance plans for updates, fixes, monitoring, and performance care.",
+            keywords: ["maintenance", "support", "after launch"],
+        },
+        {
+            question: "Can you build e-commerce websites?",
+            answer: "Yes. I build custom e-commerce systems with catalog, order flow, payment placeholders, and admin operations.",
+            keywords: ["ecommerce", "e-commerce", "store", "shop"],
+        },
+        {
+            question: "Do you offer AI chatbot development?",
+            answer: "Yes. I build FAQ bots, smart GPT assistants, and CRM-aware chatbot workflows.",
+            keywords: ["chatbot", "ai", "gpt", "assistant"],
+        },
+        {
+            question: "Can you automate repetitive business tasks?",
+            answer: "Yes. I create Python automation workflows for lead routing, reporting, data sync, and operations.",
+            keywords: ["automation", "script", "workflow", "python"],
+        },
+        {
+            question: "What are your payment terms?",
+            answer: "Projects are milestone-based with an advance to start. Final handover happens after full payment.",
+            keywords: ["payment", "pricing", "advance", "milestone"],
+        },
+        {
+            question: "Do you provide SEO services?",
+            answer: "Yes. I provide technical SEO, on-page optimization, structure improvements, and growth-focused SEO plans.",
+            keywords: ["seo", "ranking", "search engine"],
+        },
+        {
+            question: "How can I start a project with you?",
+            answer: "Use the Contact or Client Inquiry form, share your goals, and I will respond with scope, timeline, and estimate.",
+            keywords: ["start", "hire", "book", "contact"],
+        },
+        {
+            question: "Can I customize one of your plans?",
+            answer: "Yes. Plans are a baseline. I can create a custom proposal based on your business and technical needs.",
+            keywords: ["custom", "plan", "tailored", "package"],
+        },
+    ];
+
+    if (faqChatToggle && faqChatPanel && faqChatMessages && faqQuickQuestions && faqChatForm && faqChatInput) {
+        const appendFaqMessage = (message, type) => {
+            const row = document.createElement("div");
+            row.className = `faq-msg ${type === "user" ? "faq-msg-user" : "faq-msg-bot"}`;
+            row.textContent = message;
+            faqChatMessages.appendChild(row);
+            faqChatMessages.scrollTop = faqChatMessages.scrollHeight;
+        };
+
+        const findFaqAnswer = (inputText) => {
+            const text = (inputText || "").toLowerCase().trim();
+            if (!text) {
+                return "Please type a question. You can ask about services, pricing, timeline, or support.";
+            }
+            const match = faqData.find((item) =>
+                item.keywords.some((keyword) => text.includes(keyword))
+            );
+            if (match) {
+                return match.answer;
+            }
+            return "I can help with services, pricing, timeline, automation, AI chatbot, SEO, and maintenance. Use the inquiry form for a detailed quote.";
+        };
+
+        const toggleFaqPanel = (isOpen) => {
+            faqChatPanel.classList.toggle("open", isOpen);
+            faqChatToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+            if (isOpen) {
+                faqChatInput.focus();
+            }
+        };
+
+        appendFaqMessage("Hi, I am your FAQ assistant. Ask me anything about services, pricing, or timeline.", "bot");
+
+        faqData.slice(0, 8).forEach((item) => {
+            const chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "faq-chip";
+            chip.textContent = item.question;
+            chip.addEventListener("click", () => {
+                appendFaqMessage(item.question, "user");
+                window.setTimeout(() => appendFaqMessage(item.answer, "bot"), 220);
+                toggleFaqPanel(true);
+            });
+            faqQuickQuestions.appendChild(chip);
+        });
+
+        faqChatToggle.addEventListener("click", () => {
+            const next = !faqChatPanel.classList.contains("open");
+            toggleFaqPanel(next);
+        });
+
+        faqChatClose?.addEventListener("click", () => toggleFaqPanel(false));
+
+        faqChatForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const question = faqChatInput.value.trim();
+            if (!question) {
+                return;
+            }
+            appendFaqMessage(question, "user");
+            faqChatInput.value = "";
+            const answer = findFaqAnswer(question);
+            window.setTimeout(() => appendFaqMessage(answer, "bot"), 220);
+        });
+    }
 })();

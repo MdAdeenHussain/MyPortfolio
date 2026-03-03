@@ -1,0 +1,27 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Site Settings{% endblock %}
+{% block content %}
+<section class="pt-4 max-w-3xl">
+    <div class="glass-card p-6">
+        <h1 class="section-title text-2xl">Footer and Social Settings</h1>
+        <p class="text-muted mt-2">Update policy footer links and social profile redirects from one place.</p>
+
+        <form method="post" class="mt-6 space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <input name="instagram_url" type="text" class="input-field" placeholder="Instagram URL"
+                value="{{ settings_row.instagram_url or '' }}">
+            <input name="x_url" type="text" class="input-field" placeholder="X (Twitter) URL"
+                value="{{ settings_row.x_url or '' }}">
+            <input name="linkedin_url" type="text" class="input-field" placeholder="LinkedIn URL"
+                value="{{ settings_row.linkedin_url or '' }}">
+            <input name="facebook_url" type="text" class="input-field" placeholder="Facebook URL"
+                value="{{ settings_row.facebook_url or '' }}">
+            <input name="whatsapp_number" type="text" class="input-field" placeholder="WhatsApp Number"
+                value="{{ settings_row.whatsapp_number or '+91 9674667587' }}">
+
+            <button type="submit" class="capsule-btn capsule-primary">Save Settings</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

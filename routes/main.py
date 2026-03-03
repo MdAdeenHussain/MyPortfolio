@@ -59,6 +59,26 @@ def portfolio():
     return render_template("portfolio.html", projects=projects)
 
 
+@main_bp.route("/terms-and-conditions")
+def terms_and_conditions():
+    return render_template("legals/terms_and_conditions.html")
+
+
+@main_bp.route("/privacy-policy")
+def privacy_policy():
+    return render_template("legals/privacy_policy.html")
+
+
+@main_bp.route("/refund-policy")
+def refund_policy():
+    return render_template("legals/refund_policy.html")
+
+
+@main_bp.route("/cookies-policy")
+def cookies_policy():
+    return render_template("legals/cookies_policy.html")
+
+
 @main_bp.route("/robots.txt")
 def robots_txt():
     lines = [
@@ -76,6 +96,10 @@ def sitemap_xml():
         "main.home",
         "main.blog_list",
         "main.portfolio",
+        "main.terms_and_conditions",
+        "main.privacy_policy",
+        "main.refund_policy",
+        "main.cookies_policy",
     ]
     for endpoint in static_endpoints:
         pages.append(url_for(endpoint, _external=True))
