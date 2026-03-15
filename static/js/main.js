@@ -650,4 +650,7 @@
             window.setTimeout(() => appendFaqMessage(answer, "bot"), 220);
         });
     }
+
+    const track = document.querySelector(".marquee-track");
+    track.innerHTML += track.innerHTML;
 })();

@@ -1401,3 +1401,41 @@ body.public-page .scroll-top-btn {
         grid-template-columns: 1.3fr repeat(3, 1fr);
     }
 }
+
+
+
+
+/* ===============================
+   SLANTED AUTO SCROLL MARQUEE
+================================ */
+
+.slanted-marquee {
+  overflow: hidden;
+  transform: rotate(3deg);
+  padding: 20px 0;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 40px;
+  white-space: nowrap;
+  animation: marqueeScroll 20s linear infinite;
+  font-weight: 600;
+  font-size: 18px;
+  color: white;
+}
+
+.marquee-track span {
+  letter-spacing: 1px;
+}
+
+/* animation */
+
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
