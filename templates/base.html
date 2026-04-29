@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Md. Adeen Hussain — @adeen.codes</title>
+    <meta name="description" content="Full-stack developer portfolio for Md. Adeen Hussain (@adeen.codes)." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize/modern-normalize.min.css" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/services.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/projects.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/manifesto.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/particles.css') }}" />
+  </head>
+  <body>
+    {% block content %}{% endblock %}
+
+    <script defer src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/cursor.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/particles.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/hero.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/projects.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/contact.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>

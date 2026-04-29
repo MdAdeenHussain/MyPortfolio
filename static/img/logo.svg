@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="H monogram">
+  <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M18 10v44" />
+    <path d="M46 10v44" />
+    <path d="M18 32h28" />
+    <path d="M14 6h36v52H14z" />
+  </g>
+</svg>

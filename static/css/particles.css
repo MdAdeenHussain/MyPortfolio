@@ -1,0 +1,11 @@
+/* Canvas overlays */
+.service-canvas {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-canvas {
+    opacity: 0.3;
+  }
+}
+

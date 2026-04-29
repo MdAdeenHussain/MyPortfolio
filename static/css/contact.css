@@ -1,0 +1,138 @@
+.contact {
+  min-height: 100vh;
+  padding: 120px 0;
+  background: var(--color-black);
+}
+
+.contact-top,
+.contact-main {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.contact-available {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  font-size: var(--text-label);
+}
+
+.contact-dot {
+  color: var(--color-accent);
+}
+
+.contact-giant {
+  margin-top: 30px;
+}
+
+.contact-giant-line {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.contact-giant-italic {
+  font-style: italic;
+}
+
+.contact-form {
+  margin-top: 30px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 26px;
+}
+
+.contact-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.contact-field {
+  display: grid;
+  gap: 8px;
+}
+
+.contact-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--color-text-muted);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 14px 14px;
+}
+
+.contact-field input:focus-visible,
+.contact-field textarea:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.contact-actions {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.contact-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-accent);
+}
+
+.contact-submit-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--color-text-muted);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.contact-submit-main {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 42px);
+  letter-spacing: var(--tracking-tight);
+}
+
+.contact-submit-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.contact-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--color-text-secondary);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .contact-field-wide {
+    grid-column: span 2;
+  }
+}
+

@@ -1,0 +1,54 @@
+.manifesto {
+  padding: 120px 0;
+}
+
+.manifesto-strip {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 0 20px 10px;
+  cursor: grab;
+}
+
+.manifesto-strip:active {
+  cursor: grabbing;
+}
+
+.manifesto-card {
+  flex: 0 0 min(380px, 78vw);
+  min-height: 320px;
+  padding: 28px;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(var(--color-overlay), var(--color-overlay)), var(--color-bg-card);
+  position: relative;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.manifesto-card:hover {
+  transform: scale(1.04);
+  border-color: var(--color-accent);
+}
+
+.manifesto-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  font-size: var(--text-label);
+  color: var(--color-text-secondary);
+}
+
+.manifesto-num {
+  color: var(--color-accent);
+}
+
+.manifesto-title {
+  margin: 42px 0 0;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  font-size: clamp(26px, 3.2vw, 46px);
+  line-height: 1.05;
+}
+
